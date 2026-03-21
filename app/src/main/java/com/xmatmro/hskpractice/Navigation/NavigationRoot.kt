@@ -10,10 +10,10 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.savedstate.serialization.SavedStateConfiguration
 import com.xmatmro.hskpractice.Screens.ExercicesScreen
+import com.xmatmro.hskpractice.Screens.HanZiMeaningScreen
 import com.xmatmro.hskpractice.Screens.HomeScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
-import kotlinx.serialization.modules.subclass
 
 @Composable
 fun NavigationRoot(
@@ -25,6 +25,7 @@ fun NavigationRoot(
                 polymorphic(NavKey::class){
                     subclass(Route.Home::class,Route.Home.serializer())
                     subclass(Route.Exercices::class,Route.Exercices.serializer())
+                    subclass(Route.HanZiMeaning::class,Route.HanZiMeaning.serializer())
                 }
 
             }
@@ -55,10 +56,22 @@ fun NavigationRoot(
 
                 is Route.Exercices -> {
                     NavEntry(key) {
-                        ExercicesScreen(level = key.level)
+                        ExercicesScreen(
+                            level = key.level,
+                            onFirstClick =  { level,ammount,difficulty ->
+                                backStack.add(Route.HanZiMeaning(level,ammount, difficulty))
+
+
+                            }
+                        )
                     }
                 }
 
+                is Route.HanZiMeaning -> {
+                    NavEntry(key) {
+                        HanZiMeaningScreen(level = key.level, ammount = key.ammount,difficulty = key.difficulty)
+                    }
+                }
                 else -> error("Unknown route: $key")
             }
         }

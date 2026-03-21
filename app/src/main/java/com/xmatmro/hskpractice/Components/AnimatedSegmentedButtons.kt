@@ -88,7 +88,7 @@ fun SegmentedControl(
 @Composable
 fun SegmentedControlButton(
     onClick: () -> Unit,
-    level: Int,
+    text: String,
     selected: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -103,10 +103,11 @@ fun SegmentedControlButton(
     ) {
         Text(
             modifier = Modifier.padding(horizontal = 8.dp),
-            text = level.toString(),
+            text = text,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
+            color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -115,7 +116,7 @@ fun SegmentedControlButton(
 fun SelectedBackground(modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier.layoutId(SelectedBackgroundId),
-        color = MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.primaryContainer,
         shape = CircleShape,
         border = BorderStroke(width = 2.dp, color = MaterialTheme.colorScheme.primary),
     ) {}
@@ -123,4 +124,3 @@ fun SelectedBackground(modifier: Modifier = Modifier) {
 
 const val SelectedButtonId = "SelectedButtonId"
 const val SelectedBackgroundId = "SelectedBackgroundId"
-
