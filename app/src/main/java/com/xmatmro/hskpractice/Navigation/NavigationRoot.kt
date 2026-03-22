@@ -69,7 +69,7 @@ fun NavigationRoot(
 
                 is Route.HanZiMeaning -> {
                     NavEntry(key) {
-                        HanZiMeaningScreen(level = key.level, ammount = key.ammount,difficulty = key.difficulty)
+                        HanZiMeaningScreen(level = key.level, amount = key.amount,difficulty = key.difficulty)
                     }
                 }
                 else -> error("Unknown route: $key")

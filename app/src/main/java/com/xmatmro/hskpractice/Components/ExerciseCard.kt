@@ -88,7 +88,7 @@ fun ExercicesCard(
                             onAmountChange(input)
                         }
                     },
-                    label = { Text("Ilość znaków") },
+                    label = { Text("Ilość zadań") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,

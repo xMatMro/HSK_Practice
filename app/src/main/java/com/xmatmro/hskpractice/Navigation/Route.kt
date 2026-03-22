@@ -13,7 +13,7 @@ sealed interface Route: NavKey {
     data class Exercices(val level: Int) : Route, NavKey
 
     @Serializable
-    data class HanZiMeaning(val level: Int, val ammount: Int,val difficulty:Int) : Route, NavKey
+    data class HanZiMeaning(val level: Int, val amount: Int,val difficulty:Int) : Route, NavKey
 
 
 }
