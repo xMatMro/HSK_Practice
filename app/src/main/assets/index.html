@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+    <title>HanZi Writer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            overflow: hidden;
+            background-color: transparent;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #character-target {
+            width: 250px;
+            height: 250px;
+            background-color: #1a1a1a;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display:flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="character-target"></div>
+    <script>
+        let writer;
+        function drawCharacter(char) {
+            console.log("JS: Drawing " + char);
+            if (typeof HanziWriter === 'undefined') {
+                setTimeout(() => drawCharacter(char), 200);
+                return;
+            }
+
+            const target = document.getElementById('character-target');
+            target.innerHTML = '';
+
+            writer = HanziWriter.create('character-target', char, {
+                width: 200,
+                height: 200,
+                showOutline: true,
+                strokeAnimationSpeed: 2,
+                delayBetweenStrokes: 200,
+                padding: 10
+            });
+
+            writer.quiz();
+        }
+    </script>
+</body>
+</html>

@@ -13,7 +13,13 @@ sealed interface Route: NavKey {
     data class Exercices(val level: Int) : Route, NavKey
 
     @Serializable
-    data class HanZiMeaning(val level: Int, val amount: Int,val difficulty:Int) : Route, NavKey
+    data class HanZiMeaning(val level: Int, val amount: Int,val difficulty:Int,val back: ()-> Unit,val checked: Boolean) : Route, NavKey
 
+    @Serializable
+    data class HanZiPinYin(val level: Int, val amount: Int,val difficulty:Int,val back: ()-> Unit,val checked: Boolean) : Route, NavKey
 
+    @Serializable
+
+    data class TestDrawing(val level: Int, val back: ()-> Unit) : Route, NavKey
 }
+

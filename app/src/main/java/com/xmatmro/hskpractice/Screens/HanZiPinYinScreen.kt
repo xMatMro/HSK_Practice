@@ -1,23 +1,16 @@
 package com.xmatmro.hskpractice.Screens
 
-import android.app.Dialog
-import android.content.Context
-import androidx.activity.result.launch
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,30 +23,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.xmatmro.hskpractice.Components.loadHSKData
 import com.xmatmro.hskpractice.HSKCharacters.HSKCharactersClass
-import kotlinx.serialization.json.Json
-import kotlin.random.Random
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.viewmodel.ViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.xmatmro.hskpractice.ViewModels.GameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.collections.plus
+import kotlin.collections.shuffled
 
 @Composable
-fun HanZiMeaningScreen(
+fun HanZiPinYinScreen(
     level: Int,
     amount: Int,
     difficulty: Int,
@@ -66,9 +54,9 @@ fun HanZiMeaningScreen(
     var exerciseCharacters by remember { mutableStateOf<List<HSKCharactersClass>>(emptyList()) }
     var isProcessing by remember { mutableStateOf(false) }
     val answersAmount = when (difficulty){
-         1 -> 4
-         2 -> 6
-         3 -> 8
+        1 -> 4
+        2 -> 6
+        3 -> 8
         else -> {3}
     }
     var currentTask by remember { mutableIntStateOf(0) }
@@ -109,9 +97,11 @@ fun HanZiMeaningScreen(
                     ),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     border = BorderStroke(1.dp,Color.Black),
+                    modifier = Modifier.padding(16.dp)
 
 
-                ) {
+
+                    ) {
                     Column(
                         modifier = Modifier,
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -123,7 +113,7 @@ fun HanZiMeaningScreen(
                             )
 
                         if(checked){
-                            Text(text = exerciseCharacters[currentTask].pinyin,
+                            Text(text = exerciseCharacters[currentTask].translations[0],
                                 modifier = Modifier.padding(16.dp,4.dp),
                                 style = MaterialTheme.typography.titleMedium)
                         }
@@ -138,10 +128,11 @@ fun HanZiMeaningScreen(
                         ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                         border = BorderStroke(1.dp,Color.Green),
+                        modifier = Modifier.padding(16.dp)
 
 
                         ) {
-                        Text(text = exerciseCharacters[currentTask].translations[0],
+                        Text(text = exerciseCharacters[currentTask].pinyin,
                             modifier = Modifier.padding(16.dp),
                             style = MaterialTheme.typography.titleLarge)
 
@@ -166,7 +157,7 @@ fun HanZiMeaningScreen(
                 ) {
                     items(allAnswers){  answer ->
                         AnswerCard(
-                            answer.translations.take(3).joinToString(", \n"),
+                            answer.pinyin,
                             !isProcessing,
                             {
                                 isProcessing = true
@@ -174,7 +165,7 @@ fun HanZiMeaningScreen(
                                 scope.launch {
                                     delay(1500)
                                     isAnswerVisible = false
-                                    delay(500)
+                                    delay(600)
                                     if(answer.id == currentCorrect.id){
                                         points++
                                     }
@@ -183,7 +174,7 @@ fun HanZiMeaningScreen(
 
 
                                     } else {
-                                        gameViewModel.addPoints("hanZiMeaningScore",points,amount)
+                                        gameViewModel.addPoints("hanZiTranslationScore",points,amount)
                                         back()
                                     }
                                     isProcessing = false
@@ -202,48 +193,4 @@ fun HanZiMeaningScreen(
             }
         }
     }
-
 }
-
-@Composable
-fun AnswerCard(
-    text: String,
-    isEnabled: Boolean,
-    onClick:  () -> Unit,
-    correct: Boolean
-    ){
-    var clicked by remember(text) { mutableStateOf(false) }
-    val borderColor = when{
-        clicked && correct -> Color.Green
-        clicked && !correct -> Color.Red
-        else -> Color.Black
-    }
-
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        ),
-        border = BorderStroke(1.dp, borderColor),
-        modifier = Modifier
-            .clickable(enabled = isEnabled && !clicked) {
-                clicked = true
-                onClick()
-            }
-            .height(130.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-
-        ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ){
-            Text(text = text,modifier = Modifier.padding(16.dp), textAlign = TextAlign.Center)
-        }
-
-
-
-    }
-}
-
-
-

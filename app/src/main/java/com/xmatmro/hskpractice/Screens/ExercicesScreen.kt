@@ -1,12 +1,10 @@
 package com.xmatmro.hskpractice.Screens
 
 import android.content.Context
-import androidx.compose.foundation.clickable
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -14,22 +12,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.xmatmro.hskpractice.Components.ExercicesCard
 import com.xmatmro.hskpractice.Components.SegmentedControl
 import com.xmatmro.hskpractice.Components.SegmentedControlButton
 import com.xmatmro.hskpractice.Components.loadHSKData
 import com.xmatmro.hskpractice.HSKCharacters.HSKCharactersClass
+import com.xmatmro.hskpractice.ViewModels.GameViewModel
 import kotlinx.serialization.json.Json
-import kotlin.math.exp
+import java.util.Locale
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.compose.ui.viewinterop.AndroidView
 
 @Composable
 fun ExercicesScreen(
     level: Int,
-    onFirstClick: (Int, Int, Int) -> Unit
+    onFirstClick: (Int, Int, Int, Boolean) -> Unit,
+    onSecondClick: (Int, Int, Int, Boolean) -> Unit,
+    onThirdClick: (Int) -> Unit
 ) {
     val context = LocalContext.current
     var charactersList by remember { mutableStateOf<List<HSKCharactersClass>>(emptyList()) }
@@ -39,9 +42,8 @@ fun ExercicesScreen(
     val onAmountChange: (String) -> Unit = { input ->
         amountInput = input
     }
-    val onDifficultyChange: (Int) -> Unit = { input ->
-        difficulty = input
-    }
+
+    val gameViewModel: GameViewModel = viewModel(viewModelStoreOwner = context as ViewModelStoreOwner)
     val onCardClick: (Int) -> Unit = { index ->
         for (i in expanded.indices) {
             if (i != index) {
@@ -75,12 +77,42 @@ fun ExercicesScreen(
                 color = MaterialTheme.colorScheme.primary
             )
             HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
+
+            Column(
+                modifier = Modifier
+                    .padding(16.dp, 0.dp)
+            ) {
+                Text(
+                    text = "Poziom trudności",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                SegmentedControl {
+                    listOf(1, 2, 3).forEach { difficultyLevel ->
+                        SegmentedControlButton(
+                            onClick = { difficulty = difficultyLevel },
+                            text = difficultyLevel.toString(),
+                            selected = difficulty == difficultyLevel
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+
+
             Text(
                 text = "Wybierz ćwiczenie",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
             ExercicesCard(
                 "Znaczenie znaku",
                 expanded[0],
@@ -91,7 +123,9 @@ fun ExercicesScreen(
                 onAmountChange,
                 level,
                 difficulty,
-                onDifficultyChange
+                "hanZiMeaningScore",
+                true,
+                "pinyin"
             )
 
             ExercicesCard(
@@ -99,12 +133,14 @@ fun ExercicesScreen(
                 expanded[1],
                 onCardClick,
                 1,
-                onFirstClick,
+                onSecondClick,
                 amountInput,
                 onAmountChange,
                 level,
                 difficulty,
-                onDifficultyChange
+                "hanZiPinYinScore",
+                true,
+                "tłumaczenie"
             )
 
             ExercicesCard(
@@ -117,12 +153,30 @@ fun ExercicesScreen(
                 onAmountChange,
                 level,
                 difficulty,
-                onDifficultyChange
+                "hanZiMeaningScore",
+                false,
+                ""
             )
+            Text(
+                text = "Praktyka",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+            )
+            Button(
+                onClick = {
+                    onFirstClick(level, 10, difficulty,false)
+                },
+                modifier = Modifier
+                    .padding(16.dp)
+
+            ){
+                Text(
+                    text = "Zobacz rysowanie",
+
+                )
+            }
+
+
         }
     }
 }
-
-private val hskJson = Json { ignoreUnknownKeys = true }
-
-
