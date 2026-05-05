@@ -32,7 +32,7 @@ fun ExercicesScreen(
     level: Int,
     onFirstClick: (Int, Int, Int, Boolean) -> Unit,
     onSecondClick: (Int, Int, Int, Boolean) -> Unit,
-    onThirdClick: (Int) -> Unit
+    onThirdClick: (Int, Int, Int, Boolean) -> Unit
 ) {
     val context = LocalContext.current
     var charactersList by remember { mutableStateOf<List<HSKCharactersClass>>(emptyList()) }
@@ -107,7 +107,7 @@ fun ExercicesScreen(
 
 
             Text(
-                text = "Wybierz ćwiczenie",
+                text = "Ćwiczenia",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
@@ -123,6 +123,7 @@ fun ExercicesScreen(
                 onAmountChange,
                 level,
                 difficulty,
+                true,
                 "hanZiMeaningScore",
                 true,
                 "pinyin"
@@ -138,6 +139,7 @@ fun ExercicesScreen(
                 onAmountChange,
                 level,
                 difficulty,
+                true,
                 "hanZiPinYinScore",
                 true,
                 "tłumaczenie"
@@ -153,6 +155,7 @@ fun ExercicesScreen(
                 onAmountChange,
                 level,
                 difficulty,
+                true,
                 "hanZiMeaningScore",
                 false,
                 ""
@@ -162,19 +165,21 @@ fun ExercicesScreen(
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
-            Button(
-                onClick = {
-                    onFirstClick(level, 10, difficulty,false)
-                },
-                modifier = Modifier
-                    .padding(16.dp)
-
-            ){
-                Text(
-                    text = "Zobacz rysowanie",
-
-                )
-            }
+            ExercicesCard(
+                title = "Ćwiczenie rysowania",
+                expanded[3],
+                onCardClick,
+                3,
+                onThirdClick,
+                amountInput,
+                onAmountChange,
+                level,
+                difficulty,
+                false,
+                "testDrawingScore",
+                false,
+                helpText = ""
+            )
 
 
         }

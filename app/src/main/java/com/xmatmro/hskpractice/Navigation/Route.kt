@@ -20,6 +20,6 @@ sealed interface Route: NavKey {
 
     @Serializable
 
-    data class TestDrawing(val level: Int, val back: ()-> Unit) : Route, NavKey
+    data class TestDrawing(val level: Int,val amount: Int,val difficulty: Int, val back: ()-> Unit) : Route, NavKey
 }
 

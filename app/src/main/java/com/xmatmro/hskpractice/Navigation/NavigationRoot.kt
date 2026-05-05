@@ -30,6 +30,7 @@ fun NavigationRoot(
                     subclass(Route.Exercices::class,Route.Exercices.serializer())
                     subclass(Route.HanZiMeaning::class,Route.HanZiMeaning.serializer())
                     subclass(Route.HanZiPinYin::class,Route.HanZiPinYin.serializer())
+                    subclass(Route.TestDrawing::class,Route.TestDrawing.serializer())
                 }
 
             }
@@ -62,9 +63,9 @@ fun NavigationRoot(
                     NavEntry(key) {
                         ExercicesScreen(
                             level = key.level,
-                            onFirstClick =  { level,ammount,difficulty,checked ->
+                            onFirstClick =  { level,amount,difficulty,checked ->
                                 backStack.remove(key)
-                                backStack.add(Route.HanZiMeaning(level,ammount, difficulty, back = {
+                                backStack.add(Route.HanZiMeaning(level,amount, difficulty, back = {
                                     backStack.removeAt(backStack.lastIndex)
                                     backStack.add(Route.Exercices(level))
                                 },checked))
@@ -72,17 +73,17 @@ fun NavigationRoot(
 
 
                             },
-                            onSecondClick = { level,ammount,difficulty,checked ->
+                            onSecondClick = { level,amount,difficulty,checked ->
                                 backStack.remove(key)
-                                backStack.add(Route.HanZiPinYin(level,ammount, difficulty, back = {
+                                backStack.add(Route.HanZiPinYin(level,amount, difficulty, back = {
                                     backStack.removeAt(backStack.lastIndex)
                                     backStack.add(Route.Exercices(level))
 
                                 },checked))
                             },
-                            onThirdClick = { level ->
+                            onThirdClick = { level, amount,difficulty,checked ->
                                 backStack.remove(key)
-                                backStack.add(Route.TestDrawing(level, back = {
+                                backStack.add(Route.TestDrawing(level,amount,difficulty, back = {
                                     backStack.removeAt(backStack.lastIndex)
                                     backStack.add(Route.Exercices(level))
                                 }))
@@ -106,7 +107,7 @@ fun NavigationRoot(
 
                 is Route.TestDrawing ->{
                     NavEntry(key) {
-                        TestDrawingScreen(level = key.level, back = key.back)
+                        TestDrawingScreen(level = key.level, amount = key.amount, difficulty = key.difficulty, back = key.back)
                     }
                 }
                 else -> error("Unknown route: $key")

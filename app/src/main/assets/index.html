@@ -29,7 +29,7 @@
             background-color: #1a1a1a;
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            display:flex;
+            display: flex;
             justify-content: center;
             align-items: center;
         }
@@ -39,11 +39,20 @@
     <div id="character-target"></div>
     <script>
         let writer;
+        let wordList = [];
+        let wordIndex = 0;
+        let charIndexInWord = 0;
+        let showOutline = true;
+        let isStarted = false;
+
         function drawCharacter(char) {
-            console.log("JS: Drawing " + char);
             if (typeof HanziWriter === 'undefined') {
                 setTimeout(() => drawCharacter(char), 200);
                 return;
+            }
+
+            if (writer) {
+                try { writer.cancelQuiz(); } catch (e) {}
             }
 
             const target = document.getElementById('character-target');
@@ -52,13 +61,57 @@
             writer = HanziWriter.create('character-target', char, {
                 width: 200,
                 height: 200,
-                showOutline: true,
+                showOutline: showOutline,
                 strokeAnimationSpeed: 2,
                 delayBetweenStrokes: 200,
-                padding: 10
+                padding: 15,
+                strokeColor: '#FFFFFF',
+                outlineColor: '#444444',
+                drawingColor: '#FFFFFF'
             });
 
-            writer.quiz();
+            writer.quiz({
+                onComplete: function(summaryData) {
+                    charIndexInWord++;
+                    const currentWord = wordList[wordIndex];
+
+                    if (charIndexInWord < currentWord.length) {
+                        setTimeout(() => drawCharacter(currentWord[charIndexInWord]), 200);
+                    } else {
+                        if (window.Android) {
+                            window.Android.onTaskComplete();
+                        }
+                        charIndexInWord = 0;
+                        wordIndex++;
+                        setTimeout(nextQuestion, 600);
+                    }
+                }
+            });
+        }
+
+        function begin(randomTab, difficulty) {
+            if (isStarted && wordList.length > 0) return;
+            isStarted = true;
+
+            wordList = randomTab;
+            if (!wordList || wordList.length === 0) return;
+
+            showOutline = (difficulty != 3);
+            wordIndex = 0;
+            charIndexInWord = 0;
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            if (wordIndex < wordList.length) {
+                const currentWord = wordList[wordIndex];
+                drawCharacter(currentWord[charIndexInWord]);
+            } else {
+                isStarted = false;
+                if (window.Android) {
+                    window.Android.onExerciseFinished();
+                }
+            }
         }
     </script>
 </body>

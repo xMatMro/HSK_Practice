@@ -1,6 +1,7 @@
 package com.xmatmro.hskpractice.Components
 
 import android.R.attr.onClick
+import android.R.attr.shape
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -53,6 +54,7 @@ fun ExercicesCard(
     onAmountChange: (String) -> Unit,
     level: Int,
     difficulty: Int,
+    viewModel: Boolean,
     viewModelName: String,
     help: Boolean,
     helpText: String
@@ -97,22 +99,26 @@ fun ExercicesCard(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 HorizontalDivider(thickness = 2.dp)
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Średni wynik:",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "${thisExerciseScore.average}%",
-                        color =  if (thisExerciseScore.average < 40) Color.Red else if (thisExerciseScore.average > 80) Color.Green else MaterialTheme.colorScheme.onPrimaryContainer,
-                    )
+                if(viewModel){
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Średni wynik:",
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "${thisExerciseScore.average}%",
+                            color =  if (thisExerciseScore.average < 40) Color.Red else if (thisExerciseScore.average > 80) Color.Green else MaterialTheme.colorScheme.onPrimaryContainer,
+                        )
+                    }
+
+                    HorizontalDivider(thickness = 2.dp)
                 }
-                HorizontalDivider(thickness = 2.dp)
+
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = amountInput,
@@ -167,7 +173,8 @@ fun ExercicesCard(
                         val count = amountInput.toIntOrNull() ?: 10
                         onButtonClick(level, count, difficulty,checked)
                     },
-                    modifier = Modifier,
+                    modifier = Modifier
+                        .padding( if (help) 0.dp else 16.dp),
                     shape = RoundedCornerShape(50.dp)
                 ) {
                     Text("Lecimy!", fontSize = 18.sp, modifier = Modifier.padding(4.dp))

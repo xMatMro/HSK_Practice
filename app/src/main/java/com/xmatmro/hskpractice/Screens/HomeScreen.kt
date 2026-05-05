@@ -96,34 +96,7 @@ fun HomeScreen(
                 Text("Start", fontSize = 18.sp, modifier = Modifier.padding(4.dp))
 
             }
-            AndroidView(
-                modifier = Modifier
-                    .width(250.dp)
-                    .height(250.dp)
-                    .clip(RoundedCornerShape(17.dp)),
-                factory = { context ->
-                    WebView(context).apply {
-                        settings.javaScriptEnabled = true
-                        settings.domStorageEnabled = true
-                        settings.allowFileAccess = true
-                        settings.allowContentAccess = true
 
-                        settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-
-                        WebView.setWebContentsDebuggingEnabled(true)
-                        webChromeClient = WebChromeClient()
-                        webViewClient = object : WebViewClient() {
-                            override fun onPageFinished(view: WebView?, url: String?) {
-                                view?.evaluateJavascript("drawCharacter('好')", null)
-                            }
-                        }
-                        loadUrl("file:///android_asset/index.html")
-                    }
-                },
-                update = { webView ->
-                    webView.evaluateJavascript("drawCharacter('好')", null)
-                }
-            )
         }
     }
 
