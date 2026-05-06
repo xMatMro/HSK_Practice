@@ -159,9 +159,12 @@ fun HanZiPinYinScreen(
                         AnswerCard(
                             answer.pinyin,
                             !isProcessing,
-                            {
+                            {correct ->
                                 isProcessing = true
-                                isAnswerVisible = true
+                                if(!correct){
+                                    isAnswerVisible = true
+
+                                }
                                 scope.launch {
                                     delay(1500)
                                     isAnswerVisible = false

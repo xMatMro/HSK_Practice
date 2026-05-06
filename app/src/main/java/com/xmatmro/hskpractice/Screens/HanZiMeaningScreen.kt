@@ -4,6 +4,14 @@ import android.app.Dialog
 import android.content.Context
 import androidx.activity.result.launch
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateIntOffsetAsState
+import androidx.compose.animation.core.animateOffsetAsState
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.keyframesWithSpline
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollable
@@ -13,6 +21,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -42,15 +51,19 @@ import kotlin.random.Random
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.adaptive.layout.PaneExpansionAnchor
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.xmatmro.hskpractice.ViewModels.GameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @Composable
 fun HanZiMeaningScreen(
@@ -168,9 +181,12 @@ fun HanZiMeaningScreen(
                         AnswerCard(
                             answer.translations.take(3).joinToString(", \n"),
                             !isProcessing,
-                            {
+                            {correct ->
                                 isProcessing = true
-                                isAnswerVisible = true
+                                if(!correct){
+                                    isAnswerVisible = true
+                                }
+
                                 scope.launch {
                                     delay(1500)
                                     isAnswerVisible = false
@@ -209,7 +225,7 @@ fun HanZiMeaningScreen(
 fun AnswerCard(
     text: String,
     isEnabled: Boolean,
-    onClick:  () -> Unit,
+    onClick:  (Boolean) -> Unit,
     correct: Boolean
     ){
     var clicked by remember(text) { mutableStateOf(false) }
@@ -218,6 +234,9 @@ fun AnswerCard(
         clicked && !correct -> Color.Red
         else -> Color.Black
     }
+    val offsetX = remember { Animatable(0f) }
+    val offsetY = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
 
     Card(
         colors = CardDefaults.cardColors(
@@ -227,9 +246,35 @@ fun AnswerCard(
         modifier = Modifier
             .clickable(enabled = isEnabled && !clicked) {
                 clicked = true
-                onClick()
+                scope.launch{
+                    launch{
+                        if(correct){
+                            offsetY.animateTo(60f, animationSpec = tween(125) )
+                            offsetY.animateTo(-40f, animationSpec = tween(125))
+                            offsetY.animateTo(15f, animationSpec = tween(125))
+                            offsetY.animateTo(-5f, animationSpec = tween(125))
+                            offsetY.animateTo(0f, animationSpec = tween(125))
+
+                        }
+                        else{
+                            offsetX.animateTo(-60f, animationSpec = tween(75))
+                            offsetX.animateTo(55f, animationSpec = tween(75))
+                            offsetX.animateTo(-45f, animationSpec = tween(75))
+                            offsetX.animateTo(40f, animationSpec = tween(75))
+                            offsetX.animateTo(-25f, animationSpec = tween(75))
+                            offsetX.animateTo(20f, animationSpec = tween(75))
+                            offsetX.animateTo(-10f, animationSpec = tween(75))
+                            offsetX.animateTo(5f, animationSpec = tween(75))
+                            offsetX.animateTo(0f, animationSpec = tween(75))
+                        }
+
+
+                    }
+                    onClick(correct)
+                }
             }
-            .height(130.dp),
+            .height(130.dp)
+            .offset { IntOffset(offsetX.value.roundToInt(),offsetY.value.roundToInt()) },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
 
         ) {

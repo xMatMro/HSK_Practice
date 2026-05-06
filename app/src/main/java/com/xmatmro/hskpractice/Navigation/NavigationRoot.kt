@@ -1,5 +1,10 @@
 package com.xmatmro.hskpractice.Navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.with
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -18,6 +23,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NavigationRoot(
 
@@ -46,10 +52,19 @@ fun NavigationRoot(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator ()
         ),
+        transitionSpec = {
+            slideInHorizontally(initialOffsetX = {it}) togetherWith slideOutHorizontally(targetOffsetX = { -it })
+        },
+        popTransitionSpec = {
+            slideInHorizontally(initialOffsetX = { -it }) togetherWith slideOutHorizontally(targetOffsetX = { it })
+        },
+        predictivePopTransitionSpec = {
+            slideInHorizontally(initialOffsetX = { -it }) togetherWith slideOutHorizontally(targetOffsetX = { it })
+        },
         entryProvider = { key ->
             when (key) {
                 is Route.Home -> {
-                    NavEntry(key) {
+                    NavEntry(key ) {
                         HomeScreen(
                             onStartClick = { level ->
                                 backStack.add(Route.Exercices(level))

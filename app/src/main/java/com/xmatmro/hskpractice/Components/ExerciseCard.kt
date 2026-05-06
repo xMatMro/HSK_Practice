@@ -2,8 +2,10 @@ package com.xmatmro.hskpractice.Components
 
 import android.R.attr.onClick
 import android.R.attr.shape
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -79,8 +81,9 @@ fun ExercicesCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
+            .animateContentSize()
             .clickable(indication = null,
-                interactionSource = null,
+                interactionSource = remember { MutableInteractionSource() },
                 onClick = {onCardClick(Index)})
     ) {
         Column(

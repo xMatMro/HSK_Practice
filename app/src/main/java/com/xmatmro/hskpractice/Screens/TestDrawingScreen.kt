@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,19 +34,25 @@ import com.xmatmro.hskpractice.Components.loadHSKData
 import com.xmatmro.hskpractice.HSKCharacters.HSKCharactersClass
 
 class WebAppInterface(
-    private val onTaskComplete: () -> Unit,
-    private val onFinish: () -> Unit
+    private val onTaskCompleteCallback: () -> Unit,
+    private val onFinish: () -> Unit,
+    private val onIndexChangeCallback: () -> Unit
 ) {
     private val handler = android.os.Handler(android.os.Looper.getMainLooper())
 
     @JavascriptInterface
     fun onTaskComplete() {
-        handler.post { onTaskComplete() }
+        handler.post { onTaskCompleteCallback() }
     }
 
     @JavascriptInterface
     fun onExerciseFinished() {
         handler.post { onFinish() }
+    }
+
+    @JavascriptInterface
+    fun onIndexChange(){
+        handler.post { onIndexChangeCallback() }
     }
 }
 
@@ -59,7 +66,8 @@ fun TestDrawingScreen(
 ){
     val context = LocalContext.current
     var characterList by remember{mutableStateOf<List<HSKCharactersClass>>(emptyList())}
-    var currentTask by remember{mutableStateOf(1)}
+    var currentTask by remember{mutableStateOf(0)}
+    var currentIndex by remember { mutableStateOf(0) }
 
 
     LaunchedEffect(level) {
@@ -70,7 +78,10 @@ fun TestDrawingScreen(
 
     }
     fun increment(){
-        currentTask = currentTask + 1
+        if(currentTask < characterList.size-1){
+            currentTask += 1
+        }
+        currentIndex = 0
     }
     Surface(color = MaterialTheme.colorScheme.background){
         if(characterList.isEmpty()){
@@ -82,14 +93,27 @@ fun TestDrawingScreen(
             Column(
                 modifier = Modifier
                     .statusBarsPadding()
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text="Zadanie ${currentTask}/${amount}",
-                    style = MaterialTheme.typography.headlineSmall
+                Text(
+                    text="Zadanie ${currentTask+1}/${amount}",
+                    style = MaterialTheme.typography.headlineSmall,
                 )
-                Text(text = characterList[currentTask].hanzi)
+
+                Text(
+                    text = if (currentTask < characterList.size) characterList[currentTask].pinyin else "",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(16.dp)
+                )
+
+                Text(
+                    text = if(currentTask<characterList.size) "Znak ${currentIndex + 1}/${characterList[currentTask].hanzi.length}" else "Znak 0/0",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom=16.dp)
+                )
 
                 AndroidView(
                     modifier = Modifier
@@ -106,10 +130,15 @@ fun TestDrawingScreen(
                             settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
                             addJavascriptInterface(WebAppInterface(
-                                onTaskComplete = {
+                                onTaskCompleteCallback = {
                                     increment()
                                 },
-                                onFinish = {back()}
+                                onFinish = {
+                                    back()
+                                },
+                                onIndexChangeCallback = {
+                                    currentIndex++
+                                }
                             ),"Android")
                             WebView.setWebContentsDebuggingEnabled(true)
                             webChromeClient = WebChromeClient()

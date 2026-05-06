@@ -76,6 +76,9 @@
                     const currentWord = wordList[wordIndex];
 
                     if (charIndexInWord < currentWord.length) {
+                    if (window.Android){
+                        window.Android.onIndexChange();
+                    }
                         setTimeout(() => drawCharacter(currentWord[charIndexInWord]), 200);
                     } else {
                         if (window.Android) {
@@ -109,7 +112,7 @@
             } else {
                 isStarted = false;
                 if (window.Android) {
-                    window.Android.onExerciseFinished();
+                    setTimeout(window.Android.onExerciseFinished(),400);
                 }
             }
         }

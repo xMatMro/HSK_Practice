@@ -25,6 +25,7 @@ import kotlinx.serialization.json.Json
 import java.util.Locale
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Space
 import androidx.compose.ui.viewinterop.AndroidView
 
 @Composable
@@ -101,7 +102,7 @@ fun ExercicesScreen(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
 
 
@@ -112,7 +113,6 @@ fun ExercicesScreen(
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
             ExercicesCard(
                 "Znaczenie znaku",
                 expanded[0],
@@ -160,11 +160,16 @@ fun ExercicesScreen(
                 false,
                 ""
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = "Praktyka",
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
+
+
             ExercicesCard(
                 title = "Ćwiczenie rysowania",
                 expanded[3],
