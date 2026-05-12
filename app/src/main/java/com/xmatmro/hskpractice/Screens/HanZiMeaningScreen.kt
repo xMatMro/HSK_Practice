@@ -1,11 +1,15 @@
 package com.xmatmro.hskpractice.Screens
 
+import android.R.attr.text
+import android.app.Application
 import android.app.Dialog
 import android.content.Context
 import androidx.activity.result.launch
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.keyframes
@@ -15,15 +19,18 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.AlertDialog
@@ -51,12 +58,16 @@ import kotlin.random.Random
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.adaptive.layout.PaneExpansionAnchor
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -64,6 +75,7 @@ import com.xmatmro.hskpractice.ViewModels.GameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HanZiMeaningScreen(
@@ -75,8 +87,8 @@ fun HanZiMeaningScreen(
 ){
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var charactersList by remember { mutableStateOf<List<HSKCharactersClass>>(emptyList()) }
-    var exerciseCharacters by remember { mutableStateOf<List<HSKCharactersClass>>(emptyList()) }
+    var charactersList by rememberSaveable { mutableStateOf<List<HSKCharactersClass>>(emptyList()) }
+    var exerciseCharacters by rememberSaveable { mutableStateOf<List<HSKCharactersClass>>(emptyList()) }
     var isProcessing by remember { mutableStateOf(false) }
     val answersAmount = when (difficulty){
          1 -> 4
@@ -84,19 +96,34 @@ fun HanZiMeaningScreen(
          3 -> 8
         else -> {3}
     }
-    var currentTask by remember { mutableIntStateOf(0) }
+    var currentTask by rememberSaveable { mutableIntStateOf(0) }
+    var progressCurrentTask by rememberSaveable { mutableIntStateOf(0) }
     var isAnswerVisible by remember(currentTask) { mutableStateOf(false) }
 
-    val gameViewModel: GameViewModel = viewModel(viewModelStoreOwner = context as ViewModelStoreOwner)
-    var points by remember { mutableIntStateOf(0) }
+    val gameViewModel: GameViewModel = viewModel<GameViewModel>(
+        factory = ViewModelProvider.AndroidViewModelFactory.getInstance(context.applicationContext as Application))
+    var points by rememberSaveable() { mutableIntStateOf(0) }
+    val animatedProgress by animateFloatAsState(
+        targetValue =  if (exerciseCharacters.isNotEmpty()) progressCurrentTask.toFloat()  / exerciseCharacters.size else 0f,
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+        label = "progress"
 
+    )
+    var text by rememberSaveable {mutableStateOf("") }
+    var textPinYin by remember { mutableStateOf(false) }
 
     LaunchedEffect(level) {
-        val loadedData = loadHSKData(context, level)
-        if (loadedData.isNotEmpty()) {
-            charactersList = loadedData
-            exerciseCharacters = loadedData.shuffled().take(amount.coerceAtMost(loadedData.size))
+        if(exerciseCharacters.isEmpty()){
+            val loadedData = loadHSKData(context, level)
+            if (loadedData.isNotEmpty()) {
+                charactersList = loadedData
+                exerciseCharacters = loadedData.shuffled().take(amount.coerceAtMost(loadedData.size))
+                currentTask = 0
+                progressCurrentTask = 0
+                text = ""
+            }
         }
+
     }
 
     Surface(color = MaterialTheme.colorScheme.background) {
@@ -106,6 +133,7 @@ fun HanZiMeaningScreen(
             }
         }
         else{
+            text = exerciseCharacters[currentTask].hanzi
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -115,7 +143,18 @@ fun HanZiMeaningScreen(
 
 
             ) {
-                Text("Zadanie ${currentTask + 1}/${exerciseCharacters.size}",style=MaterialTheme.typography.headlineSmall)
+                LinearProgressIndicator(
+                progress = { animatedProgress },
+                modifier = Modifier
+                    .padding(top=16.dp)
+                    .width(250.dp)
+                    .height(15.dp),
+                color = ProgressIndicatorDefaults.linearColor,
+                trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                    gapSize = (-15).dp,
+                    drawStopIndicator = {}
+                )
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -129,10 +168,25 @@ fun HanZiMeaningScreen(
                         modifier = Modifier,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = exerciseCharacters[currentTask].hanzi,
-                            modifier = Modifier.padding(16.dp,4.dp),
+                        Text(text = text,
+                            modifier = Modifier
+                                .padding(16.dp,4.dp)
+                                .animateContentSize()
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = remember{ MutableInteractionSource() },
+                                    onClick = {
+                                        if(!checked){
+                                            text = if(textPinYin){
+                                                exerciseCharacters[currentTask].hanzi
+                                            } else{
+                                                "${exerciseCharacters[currentTask].hanzi}\n${exerciseCharacters[currentTask].pinyin}"
+                                            }
+                                            textPinYin = !textPinYin
+                                        }
+                                    }),
                             style = (MaterialTheme.typography.headlineSmall),
-
+                            textAlign = TextAlign.Center
                             )
 
                         if(checked){
@@ -186,10 +240,18 @@ fun HanZiMeaningScreen(
                                 if(!correct){
                                     isAnswerVisible = true
                                 }
+                                if(progressCurrentTask < exerciseCharacters.size){
+                                    progressCurrentTask++
+
+                                }
 
                                 scope.launch {
-                                    delay(1500)
-                                    isAnswerVisible = false
+                                    if(correct){
+                                        delay(1000)
+                                    }else{
+                                        delay(1500)
+                                        isAnswerVisible = false
+                                    }
                                     delay(500)
                                     if(answer.id == currentCorrect.id){
                                         points++
@@ -199,6 +261,8 @@ fun HanZiMeaningScreen(
 
 
                                     } else {
+                                        exerciseCharacters = emptyList()
+                                        charactersList = emptyList()
                                         gameViewModel.addPoints("hanZiMeaningScore",points,amount)
                                         back()
                                     }
@@ -249,10 +313,10 @@ fun AnswerCard(
                 scope.launch{
                     launch{
                         if(correct){
-                            offsetY.animateTo(60f, animationSpec = tween(125) )
-                            offsetY.animateTo(-40f, animationSpec = tween(125))
-                            offsetY.animateTo(15f, animationSpec = tween(125))
-                            offsetY.animateTo(-5f, animationSpec = tween(125))
+                            offsetY.animateTo(-60f, animationSpec = tween(125) )
+                            offsetY.animateTo(40f, animationSpec = tween(125))
+                            offsetY.animateTo(-15f, animationSpec = tween(125))
+                            offsetY.animateTo(5f, animationSpec = tween(125))
                             offsetY.animateTo(0f, animationSpec = tween(125))
 
                         }

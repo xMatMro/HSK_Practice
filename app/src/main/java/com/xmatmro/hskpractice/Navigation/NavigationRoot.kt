@@ -80,28 +80,18 @@ fun NavigationRoot(
                             level = key.level,
                             onFirstClick =  { level,amount,difficulty,checked ->
                                 backStack.remove(key)
-                                backStack.add(Route.HanZiMeaning(level,amount, difficulty, back = {
-                                    backStack.removeAt(backStack.lastIndex)
-                                    backStack.add(Route.Exercices(level))
-                                },checked))
+                                backStack.add(Route.HanZiMeaning(level,amount, difficulty,checked))
 
 
 
                             },
                             onSecondClick = { level,amount,difficulty,checked ->
                                 backStack.remove(key)
-                                backStack.add(Route.HanZiPinYin(level,amount, difficulty, back = {
-                                    backStack.removeAt(backStack.lastIndex)
-                                    backStack.add(Route.Exercices(level))
-
-                                },checked))
+                                backStack.add(Route.HanZiPinYin(level,amount, difficulty,checked))
                             },
                             onThirdClick = { level, amount,difficulty,checked ->
                                 backStack.remove(key)
-                                backStack.add(Route.TestDrawing(level,amount,difficulty, back = {
-                                    backStack.removeAt(backStack.lastIndex)
-                                    backStack.add(Route.Exercices(level))
-                                }))
+                                backStack.add(Route.TestDrawing(level,amount,difficulty))
                             }
                         )
                     }
@@ -109,20 +99,30 @@ fun NavigationRoot(
 
                 is Route.HanZiMeaning -> {
                     NavEntry(key) {
-                        HanZiMeaningScreen(level = key.level, amount = key.amount,difficulty = key.difficulty, back = key.back, checked = key.checked)
+                        HanZiMeaningScreen(level = key.level, amount = key.amount,difficulty = key.difficulty, back = {
+                            backStack.removeAt(backStack.lastIndex)
+                            backStack.add(Route.Exercices(key.level))
+                        }, checked = key.checked)
                     }
                 }
 
                 is Route.HanZiPinYin ->{
                     NavEntry(key) {
-                        HanZiPinYinScreen(level = key.level, amount = key.amount,difficulty = key.difficulty, back = key.back, checked = key.checked)
+                        HanZiPinYinScreen(level = key.level, amount = key.amount,difficulty = key.difficulty, back = {
+                            backStack.removeAt(backStack.lastIndex)
+                            backStack.add(Route.Exercices(key.level))
+
+                        }, checked = key.checked)
                     }
 
                 }
 
                 is Route.TestDrawing ->{
                     NavEntry(key) {
-                        TestDrawingScreen(level = key.level, amount = key.amount, difficulty = key.difficulty, back = key.back)
+                        TestDrawingScreen(level = key.level, amount = key.amount, difficulty = key.difficulty, back = {
+                            backStack.removeAt(backStack.lastIndex)
+                            backStack.add(Route.Exercices(key.level))
+                        })
                     }
                 }
                 else -> error("Unknown route: $key")

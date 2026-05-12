@@ -5,6 +5,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +26,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.xmatmro.hskpractice.Components.loadHSKData
 import com.xmatmro.hskpractice.HSKCharacters.HSKCharactersClass
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class WebAppInterface(
     private val onTaskCompleteCallback: () -> Unit,
@@ -65,20 +72,32 @@ fun TestDrawingScreen(
     back: () -> Unit
 ){
     val context = LocalContext.current
-    var characterList by remember{mutableStateOf<List<HSKCharactersClass>>(emptyList())}
-    var currentTask by remember{mutableStateOf(0)}
+    val scope = rememberCoroutineScope()
+    var characterList by rememberSaveable{mutableStateOf<List<HSKCharactersClass>>(emptyList())}
+    var currentTask by rememberSaveable{mutableStateOf(0)}
     var currentIndex by remember { mutableStateOf(0) }
-
+    var progressCurrentTask by rememberSaveable { mutableStateOf(0) }
+    val animatedProgress by animateFloatAsState(
+        targetValue =  if (characterList.isNotEmpty()) progressCurrentTask.toFloat()  / characterList.size else 0f,
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+        label = "progress"
+    )
 
     LaunchedEffect(level) {
-        val loadedData = loadHSKData(context,level)
-        if(loadedData.isNotEmpty()){
-            characterList = loadedData.shuffled().take(amount.coerceAtMost(loadedData.size))
+        if(characterList.isEmpty()){
+            val loadedData = loadHSKData(context,level)
+            if(loadedData.isNotEmpty()){
+                characterList = loadedData.shuffled().take(amount.coerceAtMost(loadedData.size))
+                currentTask = 0
+                progressCurrentTask = 0
+            }
         }
+
 
     }
     fun increment(){
         if(currentTask < characterList.size-1){
+            progressCurrentTask ++
             currentTask += 1
         }
         currentIndex = 0
@@ -98,9 +117,17 @@ fun TestDrawingScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text="Zadanie ${currentTask+1}/${amount}",
-                    style = MaterialTheme.typography.headlineSmall,
+                LinearProgressIndicator(
+                    progress = { animatedProgress },
+                    modifier = Modifier
+                        .padding(top=16.dp)
+                        .width(250.dp)
+                        .height(15.dp),
+                    color = ProgressIndicatorDefaults.linearColor,
+                    trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                    strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                    gapSize = (-15).dp,
+                    drawStopIndicator = {}
                 )
 
                 Text(
@@ -134,9 +161,14 @@ fun TestDrawingScreen(
                                     increment()
                                 },
                                 onFinish = {
-                                    back()
+                                    scope.launch {
+                                        delay(500)
+                                        back()
+                                    }
+
                                 },
                                 onIndexChangeCallback = {
+
                                     currentIndex++
                                 }
                             ),"Android")

@@ -1,9 +1,17 @@
 package com.xmatmro.hskpractice.Screens
 
+import android.app.Application
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,19 +45,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.xmatmro.hskpractice.Components.HSKDescriptionCard
 import com.xmatmro.hskpractice.Components.SegmentedControl
 import com.xmatmro.hskpractice.Components.SegmentedControlButton
+import com.xmatmro.hskpractice.ViewModels.GameViewModel
 
 @Composable
 fun HomeScreen(
     onStartClick: (Int) -> Unit
 ){
-    var level by rememberSaveable { mutableStateOf(1) }
+    val context = LocalContext.current
+    val gameViewModel: GameViewModel = viewModel<GameViewModel>(factory = ViewModelProvider.AndroidViewModelFactory.getInstance(context.applicationContext as Application))
+    var level = gameViewModel.level
 
     Surface(color = MaterialTheme.colorScheme.background) {
         Column(
@@ -81,7 +96,10 @@ fun HomeScreen(
                 SegmentedControl {
                     listOf<Int>(1,2,3,4,5,6).forEach { hskLevel ->
                         SegmentedControlButton(
-                            onClick = { level = hskLevel },
+                            onClick = {
+                                level = hskLevel
+                                gameViewModel.updateLevel(hskLevel)
+                                      },
                             text = hskLevel.toString(),
                             selected = level == hskLevel
                         )
@@ -96,6 +114,24 @@ fun HomeScreen(
                 Text("Start", fontSize = 18.sp, modifier = Modifier.padding(4.dp))
 
             }
+            AnimatedContent(
+                targetState = level,
+                transitionSpec ={
+                    if(targetState > initialState) {
+                    (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
+                        slideOutHorizontally { width -> -width } + fadeOut())
+                }
+                    else{
+                    (slideInHorizontally { width -> -width } + fadeIn()).togetherWith(slideOutHorizontally { width -> width } + fadeOut())
+                }
+                                },
+                label = "HSKDescriptionCardAnimation"
+            )
+             { level ->
+                 HSKDescriptionCard(
+                     level = level
+                 )
+             }
 
         }
     }

@@ -1,5 +1,6 @@
 package com.xmatmro.hskpractice.Screens
 
+import android.app.Application
 import android.content.Context
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -26,7 +27,9 @@ import java.util.Locale
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Space
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.ViewModelProvider
 
 @Composable
 fun ExercicesScreen(
@@ -38,13 +41,16 @@ fun ExercicesScreen(
     val context = LocalContext.current
     var charactersList by remember { mutableStateOf<List<HSKCharactersClass>>(emptyList()) }
     val expanded = remember { mutableStateListOf<Boolean>().apply { repeat(7) { add(false) } } }
-    var difficulty by remember { mutableStateOf(1) }
-    var amountInput by remember { mutableStateOf("10") }
+
+
+
+    val gameViewModel: GameViewModel = viewModel<GameViewModel>(factory = ViewModelProvider.AndroidViewModelFactory.getInstance(context.applicationContext as Application))
+    var difficulty = gameViewModel.difficulty
+    var amountInput = gameViewModel.amount
     val onAmountChange: (String) -> Unit = { input ->
         amountInput = input
+        gameViewModel.updateSettings(difficulty,amountInput)
     }
-
-    val gameViewModel: GameViewModel = viewModel(viewModelStoreOwner = context as ViewModelStoreOwner)
     val onCardClick: (Int) -> Unit = { index ->
         for (i in expanded.indices) {
             if (i != index) {
@@ -95,7 +101,9 @@ fun ExercicesScreen(
                 SegmentedControl {
                     listOf(1, 2, 3).forEach { difficultyLevel ->
                         SegmentedControlButton(
-                            onClick = { difficulty = difficultyLevel },
+                            onClick = { difficulty = difficultyLevel
+                                      gameViewModel.updateSettings(difficulty,amountInput)
+                            },
                             text = difficultyLevel.toString(),
                             selected = difficulty == difficultyLevel
                         )

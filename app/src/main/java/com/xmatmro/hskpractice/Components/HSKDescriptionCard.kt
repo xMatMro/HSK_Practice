@@ -1,0 +1,67 @@
+package com.xmatmro.hskpractice.Components
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun HSKDescriptionCard(
+     level:Int
+){
+    val cefr: Array<String> = arrayOf("A1","A2","B1","B2","C1","C2")
+    val description: Array<String> = arrayOf("Zrozumiesz i zaczniesz używać bardzo prostych zwrotów. Nauczysz się przedstawiać, mówić o swoim wieku, narodowości, liczyć do 100, zamawiać jedzenie i pytać o cenę.","Bez problemu poradzisz sobie w rutynowych, codziennych sytuacjach. Zapytasz o drogę, opowiesz o swojej rodzinie, hobby, pogodzie i umówisz się na spotkanie.","Jesteś w stanie swobodnie podróżować po Chinach i komunikować się z native speakerami w znanych Ci tematach z życia zawodowego i prywatnego. Zaczynasz myśleć po chińsku.","Możesz dyskutować na szeroki zakres tematów. Rozmawiasz z Chińczykami płynnie, bez większego wysiłku z obu stron. Możesz podjąć podstawową pracę w chińskojęzycznym środowisku.","Jesteś w stanie czytać chińskie gazety, portale internetowe, oglądać filmy bez angielskich napisów i wygłaszać dłuższe przemówienia. Chiński staje się Twoim pełnoprawnym narzędziem.","Biegłość zbliżona do wykształconego native speakera. Rozumiesz praktycznie wszystko, co usłyszysz lub przeczytasz. Płynnie wyrażasz opinie na bardzo abstrakcyjne, techniczne czy filozoficzne tematy.")
+    val advice: Array<String> = arrayOf("Nie stresuj się na początku pisaniem znaków z pamięci. Skup się w 100% na opanowaniu transkrypcji Pinyin i usłyszeniu 4 tonów – to fundament, który zaprocentuje później.","To idealny moment, aby zacząć uczyć się \"kluczy\" (radicals) w znakach HanZi. Kiedy zrozumiesz z czego składa się znak, przestanie być tylko dziwnym obrazkiem.","Twój zasób słów pozwala już na rozrywkę! Zacznij oglądać proste bajki (np. Świnkę Peppę w wersji mandaryńskiej) i czytać książki typu Graded Readers dopasowane do poziomu HSK 3.","Odłóż powoli podręczniki. Przerzuć się na chińskie podcasty, zacznij pisać krótki dziennik (np. na HelloTalk), żeby uczyć się wyrażać własne, złożone myśli.","Zanurz się w prawdziwym pop-kulturowym oceanie. Chińskie dramy, programy rozrywkowe (variety shows), vlogi na Bilibili (chińskim YouTube) to teraz Twoje najlepsze źródła nauki.","Sięgnij po chińską literaturę współczesną (np. powieści sci-fi Cixina Liu), gazety branżowe i poezję. Baw się językiem, poznawaj slang i idiomy (Chengyu).")
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        ),
+        elevation = CardDefaults.cardElevation(2.dp),
+        modifier = Modifier
+            .padding(16.dp)
+            .width(250.dp),
+        shape = RoundedCornerShape(25.dp),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Text(
+                text="HSK ${level}",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            HorizontalDivider()
+            Text(
+                text = "CEFR: ${cefr[level-1]}",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .padding(vertical = 8.dp, horizontal = 8.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Start
+            )
+            HorizontalDivider()
+            Text(
+                text = "Opis: ${description[level-1]}",
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(8.dp)
+            )
+
+        }
+    }
+}
