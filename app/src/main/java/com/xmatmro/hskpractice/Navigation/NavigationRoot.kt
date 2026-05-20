@@ -18,6 +18,7 @@ import com.xmatmro.hskpractice.Screens.ExercicesScreen
 import com.xmatmro.hskpractice.Screens.HanZiMeaningScreen
 import com.xmatmro.hskpractice.Screens.HanZiPinYinScreen
 import com.xmatmro.hskpractice.Screens.HomeScreen
+import com.xmatmro.hskpractice.Screens.SentencesScreen
 import com.xmatmro.hskpractice.Screens.TestDrawingScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -37,6 +38,7 @@ fun NavigationRoot(
                     subclass(Route.HanZiMeaning::class,Route.HanZiMeaning.serializer())
                     subclass(Route.HanZiPinYin::class,Route.HanZiPinYin.serializer())
                     subclass(Route.TestDrawing::class,Route.TestDrawing.serializer())
+                    subclass(Route.Sentences::class,Route.Sentences.serializer())
                 }
 
             }
@@ -92,6 +94,10 @@ fun NavigationRoot(
                             onThirdClick = { level, amount,difficulty,checked ->
                                 backStack.remove(key)
                                 backStack.add(Route.TestDrawing(level,amount,difficulty))
+                            },
+                            onFourthClick = { level, amount,difficulty ->
+                                backStack.remove(key)
+                                backStack.add(Route.Sentences(level,amount,difficulty))
                             }
                         )
                     }
@@ -123,6 +129,16 @@ fun NavigationRoot(
                             backStack.removeAt(backStack.lastIndex)
                             backStack.add(Route.Exercices(key.level))
                         })
+                    }
+                }
+
+                is Route.Sentences -> {
+                    NavEntry(key) {
+                        SentencesScreen(level = key.level, amount = key.amount, difficulty = key.difficulty, back = {
+                            backStack.removeAt(backStack.lastIndex)
+                            backStack.add(Route.Exercices(key.level))
+                        })
+
                     }
                 }
                 else -> error("Unknown route: $key")

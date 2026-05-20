@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+    <script src="./hanzi-writer.min.js"></script>
     <title>HanZi Writer</title>
     <style>
         * {
@@ -67,8 +67,29 @@
                 padding: 15,
                 strokeColor: '#FFFFFF',
                 outlineColor: '#444444',
-                drawingColor: '#FFFFFF'
-            });
+                drawingColor: '#FFFFFF',
+                charDataLoader: function(char) {
+                    return new Promise(function(resolve, reject) {
+                        try {
+                            if (window.Android && window.Android.getAssetData) {
+                                const data = window.Android.getAssetData(char);
+                                if (data) {
+                                    resolve(JSON.parse(data));
+                                } else {
+                                    reject("No data found for: " + char);
+                                }
+                            } else {
+                                fetch('./data/' + char + '.json')
+                                    .then(res => res.json())
+                                    .then(resolve)
+                                    .catch(reject);
+                            }
+                        } catch (e) {
+                            reject(e);
+                        }
+                    });
+                }
+                });
 
             writer.quiz({
                 onComplete: function(summaryData) {

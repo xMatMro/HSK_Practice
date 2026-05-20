@@ -1,5 +1,7 @@
 package com.xmatmro.hskpractice.Screens
 
+import android.content.Context
+import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
@@ -43,9 +45,20 @@ import kotlinx.coroutines.launch
 class WebAppInterface(
     private val onTaskCompleteCallback: () -> Unit,
     private val onFinish: () -> Unit,
-    private val onIndexChangeCallback: () -> Unit
+    private val onIndexChangeCallback: () -> Unit,
+    private val context: Context
 ) {
     private val handler = android.os.Handler(android.os.Looper.getMainLooper())
+
+    @JavascriptInterface
+    fun getAssetData(char: String): String? {
+        return try {
+            context.assets.open("data/$char.json").bufferedReader().use { it.readText() }
+        } catch (e: Exception) {
+            Log.e("WebView", "Error loading char data for $char", e)
+            null
+        }
+    }
 
     @JavascriptInterface
     fun onTaskComplete() {
@@ -120,7 +133,7 @@ fun TestDrawingScreen(
                 LinearProgressIndicator(
                     progress = { animatedProgress },
                     modifier = Modifier
-                        .padding(top=16.dp)
+                        .padding(top = 16.dp)
                         .width(250.dp)
                         .height(15.dp),
                     color = ProgressIndicatorDefaults.linearColor,
@@ -170,7 +183,8 @@ fun TestDrawingScreen(
                                 onIndexChangeCallback = {
 
                                     currentIndex++
-                                }
+                                },
+                                context = context
                             ),"Android")
                             WebView.setWebContentsDebuggingEnabled(true)
                             webChromeClient = WebChromeClient()
