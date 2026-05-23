@@ -95,9 +95,9 @@ fun NavigationRoot(
                                 backStack.remove(key)
                                 backStack.add(Route.TestDrawing(level,amount,difficulty))
                             },
-                            onFourthClick = { level, amount,difficulty ->
+                            onFourthClick = { level, amount,difficulty,checked ->
                                 backStack.remove(key)
-                                backStack.add(Route.Sentences(level,amount,difficulty))
+                                backStack.add(Route.Sentences(level,amount,difficulty,checked))
                             }
                         )
                     }
@@ -134,7 +134,7 @@ fun NavigationRoot(
 
                 is Route.Sentences -> {
                     NavEntry(key) {
-                        SentencesScreen(level = key.level, amount = key.amount, difficulty = key.difficulty, back = {
+                        SentencesScreen(level = key.level, amount = key.amount, difficulty = key.difficulty, checked = key.checked,back = {
                             backStack.removeAt(backStack.lastIndex)
                             backStack.add(Route.Exercices(key.level))
                         })

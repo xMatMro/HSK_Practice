@@ -5,12 +5,16 @@ import android.R.attr.shape
 import android.app.Application
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,8 +40,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.PlatformSpanStyle
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,9 +83,9 @@ fun ExercicesCard(
 
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.4f),
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(cornerRadius),
         modifier = Modifier
             .fillMaxWidth()
@@ -86,7 +93,8 @@ fun ExercicesCard(
             .animateContentSize()
             .clickable(indication = null,
                 interactionSource = remember { MutableInteractionSource() },
-                onClick = {onCardClick(Index)})
+                onClick = {onCardClick(Index)}),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.75f))
     ) {
         Column(
             modifier = Modifier
@@ -155,11 +163,26 @@ fun ExercicesCard(
                             },
                             thumbContent = {
                                 if(checked){
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = null,
+                                    Box(
                                         modifier = Modifier.size(SwitchDefaults.IconSize),
-                                    )
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "好",
+                                            fontSize = 12.sp,
+                                            textAlign = TextAlign.Start,
+                                            style = TextStyle(
+                                                platformStyle = PlatformTextStyle(
+                                                    includeFontPadding = false
+                                                ),
+                                                lineHeightStyle = LineHeightStyle(
+                                                    alignment = LineHeightStyle.Alignment.Center,
+                                                    trim = LineHeightStyle.Trim.None
+                                                )
+                                            ),
+                                            modifier = Modifier.offset(y= (-2).dp)
+                                        )
+                                    }
                                 }
                             }
 

@@ -28,6 +28,12 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Space
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelProvider
 
@@ -37,7 +43,7 @@ fun ExercicesScreen(
     onFirstClick: (Int, Int, Int, Boolean) -> Unit,
     onSecondClick: (Int, Int, Int, Boolean) -> Unit,
     onThirdClick: (Int, Int, Int, Boolean) -> Unit,
-    onFourthClick: (Int, Int, Int) -> Unit
+    onFourthClick: (Int, Int, Int, Boolean) -> Unit
 ) {
     val context = LocalContext.current
     var charactersList by remember { mutableStateOf<List<HSKCharactersClass>>(emptyList()) }
@@ -67,135 +73,165 @@ fun ExercicesScreen(
     }
 
     Surface(color= MaterialTheme.colorScheme.background) {
-        Column(
-            modifier = Modifier
-                .statusBarsPadding()
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-            ,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-
-        ) {
-            Text(
-                text = "HSK $level",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+        Box(modifier = Modifier.fillMaxSize()) {
+            val backgroundGradientColor = MaterialTheme.colorScheme.primaryContainer
+            val colorStops = arrayOf(
+                0.0f to Color.Transparent,
+                0.2f to backgroundGradientColor.copy(alpha = 0.4f),
+                0.5f to backgroundGradientColor.copy(alpha = 0.9f),
+                0.8f to backgroundGradientColor.copy(alpha = 0.4f),
+                1f to Color.Transparent
             )
-            HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
-
-            Column(
+            Box(
                 modifier = Modifier
-                    .padding(16.dp, 0.dp)
-            ) {
-                Text(
-                    text = "Poziom trudności",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                )
+                    .fillMaxSize()
+                    .blur(60.dp)
+                    .drawBehind{
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colorStops = colorStops,
+                                startY = 0f,
+                                endY = size.height,
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                SegmentedControl {
-                    listOf(1, 2, 3).forEach { difficultyLevel ->
-                        SegmentedControlButton(
-                            onClick = { difficulty = difficultyLevel
-                                      gameViewModel.updateSettings(difficulty,amountInput)
-                            },
-                            text = difficultyLevel.toString(),
-                            selected = difficulty == difficultyLevel
+                                ),
+                            topLeft = Offset(size.width / 2 - size.width / 4, 0f),
+                            size = Size(size.width / 2, size.height)
                         )
                     }
+            )
+            Column(
+                modifier = Modifier
+                    .statusBarsPadding()
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+
+                ) {
+                Text(
+                    text = "HSK $level",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
+                )
+
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp, 0.dp)
+                ) {
+                    Text(
+                        text = "Poziom trudności",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    SegmentedControl {
+                        listOf(1, 2, 3).forEach { difficultyLevel ->
+                            SegmentedControlButton(
+                                onClick = {
+                                    difficulty = difficultyLevel
+                                    gameViewModel.updateSettings(difficulty, amountInput)
+                                },
+                                text = difficultyLevel.toString(),
+                                selected = difficulty == difficultyLevel
+                            )
+                        }
+                    }
                 }
+                Spacer(modifier = Modifier.height(8.dp))
+
+
+
+
+                Text(
+                    text = "Ćwiczenia",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f)
+                )
+
+                ExercicesCard(
+                    "Znaczenie znaku",
+                    expanded[0],
+                    onCardClick,
+                    0,
+                    onFirstClick,
+                    amountInput,
+                    onAmountChange,
+                    level,
+                    difficulty,
+                    true,
+                    "hanZiMeaningScore",
+                    true,
+                    "pinyin"
+                )
+
+                ExercicesCard(
+                    "Pinyin znaku",
+                    expanded[1],
+                    onCardClick,
+                    1,
+                    onSecondClick,
+                    amountInput,
+                    onAmountChange,
+                    level,
+                    difficulty,
+                    true,
+                    "hanZiPinYinScore",
+                    true,
+                    "tłumaczenie"
+                )
+
+                ExercicesCard(
+                    "Zdania z rozsypanki",
+                    expanded[2],
+                    onCardClick,
+                    2,
+                    onFourthClick,
+                    amountInput,
+                    onAmountChange,
+                    level,
+                    difficulty,
+                    true,
+                    "sentencesScore",
+                    false,
+                    ""
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Praktyka",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f)
+                )
+
+
+                ExercicesCard(
+                    title = "Ćwiczenie rysowania",
+                    expanded[3],
+                    onCardClick,
+                    3,
+                    onThirdClick,
+                    amountInput,
+                    onAmountChange,
+                    level,
+                    difficulty,
+                    false,
+                    "testDrawingScore",
+                    false,
+                    helpText = ""
+                )
+
+
             }
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-
-
-            Text(
-                text = "Ćwiczenia",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-            )
-
-            ExercicesCard(
-                "Znaczenie znaku",
-                expanded[0],
-                onCardClick,
-                0,
-                onFirstClick,
-                amountInput,
-                onAmountChange,
-                level,
-                difficulty,
-                true,
-                "hanZiMeaningScore",
-                true,
-                "pinyin"
-            )
-
-            ExercicesCard(
-                "Pinyin znaku",
-                expanded[1],
-                onCardClick,
-                1,
-                onSecondClick,
-                amountInput,
-                onAmountChange,
-                level,
-                difficulty,
-                true,
-                "hanZiPinYinScore",
-                true,
-                "tłumaczenie"
-            )
-
-            ExercicesCard(
-                "Zdania z rozsypanki",
-                expanded[2],
-                onCardClick,
-                2,
-                onFirstClick,
-                amountInput,
-                onAmountChange,
-                level,
-                difficulty,
-                true,
-                "hanZiMeaningScore",
-                false,
-                ""
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Praktyka",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-            )
-
-
-            ExercicesCard(
-                title = "Ćwiczenie rysowania",
-                expanded[3],
-                onCardClick,
-                3,
-                onThirdClick,
-                amountInput,
-                onAmountChange,
-                level,
-                difficulty,
-                false,
-                "testDrawingScore",
-                false,
-                helpText = ""
-            )
-
-
         }
     }
 }

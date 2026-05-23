@@ -23,6 +23,6 @@ sealed interface Route: NavKey {
     data class TestDrawing(val level: Int,val amount: Int,val difficulty: Int) : Route, NavKey
 
     @Serializable
-    data class Sentences(val level: Int,val amount: Int,val difficulty: Int) : Route, NavKey
+    data class Sentences(val level: Int,val amount: Int,val difficulty: Int,val checked: Boolean) : Route, NavKey
 }
 

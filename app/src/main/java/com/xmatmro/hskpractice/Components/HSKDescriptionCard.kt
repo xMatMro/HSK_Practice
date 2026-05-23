@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
@@ -27,9 +28,9 @@ fun HSKDescriptionCard(
     val advice: Array<String> = arrayOf("Nie stresuj się na początku pisaniem znaków z pamięci. Skup się w 100% na opanowaniu transkrypcji Pinyin i usłyszeniu 4 tonów – to fundament, który zaprocentuje później.","To idealny moment, aby zacząć uczyć się \"kluczy\" (radicals) w znakach HanZi. Kiedy zrozumiesz z czego składa się znak, przestanie być tylko dziwnym obrazkiem.","Twój zasób słów pozwala już na rozrywkę! Zacznij oglądać proste bajki (np. Świnkę Peppę w wersji mandaryńskiej) i czytać książki typu Graded Readers dopasowane do poziomu HSK 3.","Odłóż powoli podręczniki. Przerzuć się na chińskie podcasty, zacznij pisać krótki dziennik (np. na HelloTalk), żeby uczyć się wyrażać własne, złożone myśli.","Zanurz się w prawdziwym pop-kulturowym oceanie. Chińskie dramy, programy rozrywkowe (variety shows), vlogi na Bilibili (chińskim YouTube) to teraz Twoje najlepsze źródła nauki.","Sięgnij po chińską literaturę współczesną (np. powieści sci-fi Cixina Liu), gazety branżowe i poezję. Baw się językiem, poznawaj slang i idiomy (Chengyu).")
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.4f),
         ),
-        elevation = CardDefaults.cardElevation(2.dp),
+        elevation = CardDefaults.cardElevation(0.dp),
         modifier = Modifier
             .padding(16.dp)
             .width(250.dp),
