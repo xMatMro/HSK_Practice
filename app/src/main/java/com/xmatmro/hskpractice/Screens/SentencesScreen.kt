@@ -6,19 +6,25 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideIn
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,19 +46,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.xmatmro.hskpractice.Components.loadHSKData
 import com.xmatmro.hskpractice.HSKCharacters.HSKCharactersClass
 import com.xmatmro.hskpractice.HSKCharacters.HSKSentence
 import com.xmatmro.hskpractice.ViewModels.GameViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlin.math.ceil
 
@@ -68,7 +79,6 @@ fun SentencesScreen(
     val scope = rememberCoroutineScope()
     var charactersList by rememberSaveable { mutableStateOf<List<HSKSentence>>(emptyList()) }
     var exerciseCharacters by rememberSaveable { mutableStateOf<List<HSKSentence>>(emptyList()) }
-    var isProcessing by remember { mutableStateOf(false) }
     var currentTask by rememberSaveable { mutableStateOf(0) }
     var progressCurrentTask by rememberSaveable { mutableStateOf(0) }
     val blockAmount = when(difficulty){
@@ -90,7 +100,8 @@ fun SentencesScreen(
     var textPinYin by remember { mutableStateOf(false) }
     var isAnswerVisible by remember(currentTask) { mutableStateOf(false) }
     var order by rememberSaveable { mutableStateOf(emptyList<Int>()) }
-    var isEnabled by rememberSaveable { mutableStateOf(false) }
+    var isEnabled by rememberSaveable { mutableStateOf(true) }
+    var slideIn by rememberSaveable {mutableStateOf(false) }
     LaunchedEffect(level) {
         if(exerciseCharacters.isEmpty()){
             val fileName = "hskSentences.json"
@@ -105,46 +116,56 @@ fun SentencesScreen(
             }
         }
     }
-    Surface(color = MaterialTheme.colorScheme.background) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            val backgroundGradientColor = MaterialTheme.colorScheme.primaryContainer
-            val colorStops = arrayOf(
-                0.0f to Color.Transparent,
-                0.2f to backgroundGradientColor.copy(alpha = 0.4f),
-                0.5f to backgroundGradientColor.copy(alpha = 0.9f),
-                0.8f to backgroundGradientColor.copy(alpha = 0.4f),
-                1f to Color.Transparent
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .blur(60.dp)
-                    .drawBehind{
-                        drawRect(
-                            brush = Brush.verticalGradient(
-                                colorStops = colorStops,
-                                startY = 0f,
-                                endY = size.height,
-
-                                ),
-                            topLeft = Offset(size.width / 2 - size.width / 4, 0f),
-                            size = Size(size.width / 2, size.height)
-                        )
-                    }
-            )
-            if (exerciseCharacters.isEmpty()) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            }
-            else {
-                Column(
+    if(slideIn){
+        WinningScreen(
+            points,
+            amount,
+            difficulty,
+            back,
+            0,
+            slideIn
+        )}
+        else{
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                val backgroundGradientColor = MaterialTheme.colorScheme.primaryContainer
+                val colorStops = arrayOf(
+                    0.0f to Color.Transparent,
+                    0.2f to backgroundGradientColor.copy(alpha = 0.4f),
+                    0.5f to backgroundGradientColor.copy(alpha = 0.9f),
+                    0.8f to backgroundGradientColor.copy(alpha = 0.4f),
+                    1f to Color.Transparent
+                )
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .statusBarsPadding(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ){
+                        .blur(60.dp)
+                        .drawBehind{
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    colorStops = colorStops,
+                                    startY = 0f,
+                                    endY = size.height,
+
+                                    ),
+                                topLeft = Offset(size.width / 2 - size.width / 4, 0f),
+                                size = Size(size.width / 2, size.height)
+                            )
+                        }
+                )
+                if (exerciseCharacters.isEmpty()) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+                else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .statusBarsPadding(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ){
                         LinearProgressIndicator(
                             progress = { animatedProgress },
                             modifier = Modifier
@@ -167,7 +188,7 @@ fun SentencesScreen(
                             modifier = Modifier.padding(16.dp)
                         ) {
                             Column(
-                                modifier = Modifier,
+                                modifier = Modifier.padding(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
@@ -189,7 +210,7 @@ fun SentencesScreen(
                                                 }
                                             }
                                         ),
-                                    style = MaterialTheme.typography.headlineSmall,
+                                    style = MaterialTheme.typography.titleLarge,
                                     textAlign = TextAlign.Center
                                 )
                                 if(checked){
@@ -207,7 +228,8 @@ fun SentencesScreen(
                                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                                 ),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                border = BorderStroke(1.dp,Color.Green)
+                                border = BorderStroke(1.dp,Color.Green),
+                                modifier = Modifier.padding(16.dp)
                             ) {
                                 Text(
                                     text=exerciseCharacters[currentTask].hanziSentence,
@@ -216,87 +238,146 @@ fun SentencesScreen(
                                 )
                             }
                         }
-                    val trimmed = remember(currentTask) {if(exerciseCharacters[currentTask].hanziSentence[exerciseCharacters[currentTask].hanziSentence.length-1] == '。'){
-                        exerciseCharacters[currentTask].hanziSentence.replace("。","")
-                    }else{
-                        exerciseCharacters[currentTask].hanziSentence
-                    }  }
+                        val trimmed = remember(currentTask) {if(exerciseCharacters[currentTask].hanziSentence[exerciseCharacters[currentTask].hanziSentence.length-1] == '。'){
+                            exerciseCharacters[currentTask].hanziSentence.replace("。","")
+                        }else{
+                            exerciseCharacters[currentTask].hanziSentence
+                        }  }
 
-                    val chunkSize = remember(currentTask) { ceil(trimmed.length.toDouble() / amount).toInt().coerceAtLeast(1) }
-                    val blocks = remember(currentTask) { if(trimmed.length>=blockAmount){
-                        trimmed.chunked(chunkSize)
-                    } else{
-                        trimmed.chunked(trimmed.length)
-                    }
-                    }
-                    val shuffledBlock = remember(currentTask){
-                        blocks.mapIndexed { index, s -> index to s }.shuffled()
-                    }
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ){
-                        items(shuffledBlock.size){ index ->
-                            SentencePartCard(
-                                id = index,
-                                text = shuffledBlock[index].second,
-                                addToOrder = {id ->
-                                    order = if(!order.contains(id)){
-                                        order + id
-                                    } else{
-                                        order - id
-                                    }
-                                },
-                                onClick = {
+                        val chunkSize = remember(currentTask) { ceil(trimmed.length.toDouble() / blockAmount).toInt().coerceAtLeast(1) }
+                        val blocks = remember(currentTask) { if(trimmed.length>=blockAmount){
+                            trimmed.chunked(chunkSize)
+                        } else{
+                            trimmed.chunked(trimmed.length)
+                        }
+                        }
+                        val shuffledBlock = remember(currentTask){
+                            blocks.mapIndexed { index, s -> index to s }.shuffled()
+                        }
+
+                        var correctOrder by rememberSaveable(currentTask) { mutableStateOf(List(blocks.size){it}) }
+                        var answeredCorrectly by rememberSaveable(currentTask) { mutableIntStateOf(1) }
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                            ,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ){
+                            items(shuffledBlock.size){ index ->
+                                SentencePartCard(
+                                    id = shuffledBlock[index].first,
+                                    text = shuffledBlock[index].second,
+                                    addToOrder = {id ->
+                                        order = if(!order.contains(id)){
+                                            order + id
+                                        } else{
+                                            order - id
+                                        }
+                                    },
+                                    isEnabled = isEnabled,
+                                    answeredCorrectly = answeredCorrectly
+
+                                )
+
+                            }
+
+                        }
+                        Button(
+                            modifier = Modifier.padding(16.dp),
+                            onClick = {
+                                isEnabled = false
+                                if(order != correctOrder){
                                     isAnswerVisible = true
-                                },
-                                isEnabled = isEnabled
+                                    answeredCorrectly = 2
+                                }else{
+                                    answeredCorrectly = 3
+                                }
+                                if(progressCurrentTask < exerciseCharacters.size){
+                                    progressCurrentTask++
+                                }
+                                scope.launch {
+                                    if(order == correctOrder){
+                                        points++
+                                        order = emptyList()
+                                        delay(1000)
+                                    }else{
+                                        delay(1500)
+                                        isAnswerVisible = false
+                                    }
+                                    delay(500)
+                                    answeredCorrectly = 1
+                                    if(currentTask < exerciseCharacters.size - 1) {
+                                        currentTask++
+                                    }else{
+                                        slideIn = true
+                                        gameViewModel.addPoints("sentencesScore",points,amount)
 
+                                    }
+
+                                    isEnabled = true
+                                }
+                            }
+                        ){
+                            Text(
+                                text = "Zatwierdź",
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(4.dp),
+                                textAlign = TextAlign.Center
                             )
-
                         }
 
                     }
-
-                    }
                 }
+            }
         }
+
     }
+
 }
 @Composable
 fun SentencePartCard(
     id: Int,
     text: String,
     addToOrder: (Int) -> Unit,
-    onClick: (Int) -> Unit,
-    isEnabled: Boolean
+    isEnabled: Boolean,
+    answeredCorrectly: Int,
 ){
-    val shadowColor = MaterialTheme.colorScheme.primary
     var clicked by remember(text) { mutableStateOf(false) }
-
+    val borderColor = when(answeredCorrectly){
+         1 -> if(clicked) MaterialTheme.colorScheme.primary else Color.Black
+         2 -> Color.Red
+         3 -> Color.Green
+        else -> Color.Black
+    }
 
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         elevation = CardDefaults.cardElevation(2.dp),
-        border = BorderStroke(1.dp,Color.Black),
         modifier = Modifier
-            .clickable(isEnabled){
-                addToOrder(id)
-
-            }
-            .height(130.dp)
+            .padding(6.dp)
+            .height(90.dp)
+            .clickable(
+                indication = null,
+                interactionSource = remember{ MutableInteractionSource() },
+                enabled = isEnabled,
+                onClick = {
+                    addToOrder(id)
+                    clicked = !clicked
+                }
+            ),
+        border = BorderStroke(if(clicked && answeredCorrectly == 1)2.dp else 1.dp,borderColor),
     ){
         Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
         contentAlignment = Alignment.Center
         ){
-            Text(text = text,modifier = Modifier.padding(16.dp), textAlign = TextAlign.Center)
+            Text(text = text,modifier = Modifier.padding(16.dp), textAlign = TextAlign.Center,style = MaterialTheme.typography.titleLarge)
         }
     }
 

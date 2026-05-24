@@ -63,7 +63,11 @@ import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.adaptive.layout.PaneExpansionAnchor
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -111,7 +115,7 @@ fun HanZiMeaningScreen(
     )
     var text by rememberSaveable {mutableStateOf("") }
     var textPinYin by remember { mutableStateOf(false) }
-
+    var slideIn by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(level) {
         if(exerciseCharacters.isEmpty()){
             val loadedData = loadHSKData(context, level)
@@ -125,164 +129,207 @@ fun HanZiMeaningScreen(
         }
 
     }
+if(slideIn){
+    WinningScreen(
+        points = points,
+        amount = amount,
+        difficulty = difficulty,
+        back = back,
+        time = 0,
+        slideIn = slideIn
 
+    )
+}else {
     Surface(color = MaterialTheme.colorScheme.background) {
-        if(exerciseCharacters.isEmpty()){
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-        else{
-            text = exerciseCharacters[currentTask].hanzi
-            Column(
+        Box(modifier = Modifier.fillMaxSize()) {
+            val backgroundGradientColor = MaterialTheme.colorScheme.primaryContainer
+            val colorStops = arrayOf(
+                0.0f to Color.Transparent,
+                0.2f to backgroundGradientColor.copy(alpha = 0.4f),
+                0.5f to backgroundGradientColor.copy(alpha = 0.9f),
+                0.8f to backgroundGradientColor.copy(alpha = 0.4f),
+                1f to Color.Transparent
+            )
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .statusBarsPadding(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .blur(60.dp)
+                    .drawBehind {
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colorStops = colorStops,
+                                startY = 0f,
+                                endY = size.height,
 
-
-            ) {
-                LinearProgressIndicator(
-                progress = { animatedProgress },
-                modifier = Modifier
-                    .padding(top=16.dp)
-                    .width(250.dp)
-                    .height(15.dp),
-                color = ProgressIndicatorDefaults.linearColor,
-                trackColor = ProgressIndicatorDefaults.linearTrackColor,
-                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-                    gapSize = (-15).dp,
-                    drawStopIndicator = {}
-                )
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    border = BorderStroke(1.dp,Color.Black),
+                                ),
+                            topLeft = Offset(size.width / 2 - size.width / 4, 0f),
+                            size = Size(size.width / 2, size.height)
+                        )
+                    }
+            )
+            if (exerciseCharacters.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                text = exerciseCharacters[currentTask].hanzi
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .statusBarsPadding(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
 
 
                 ) {
-                    Column(
-                        modifier = Modifier,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(text = text,
-                            modifier = Modifier
-                                .padding(16.dp,4.dp)
-                                .animateContentSize()
-                                .clickable(
-                                    indication = null,
-                                    interactionSource = remember{ MutableInteractionSource() },
-                                    onClick = {
-                                        if(!checked){
-                                            text = if(textPinYin){
-                                                exerciseCharacters[currentTask].hanzi
-                                            } else{
-                                                "${exerciseCharacters[currentTask].hanzi}\n${exerciseCharacters[currentTask].pinyin}"
-                                            }
-                                            textPinYin = !textPinYin
-                                        }
-                                    }),
-                            style = (MaterialTheme.typography.headlineSmall),
-                            textAlign = TextAlign.Center
-                            )
-
-                        if(checked){
-                            Text(text = exerciseCharacters[currentTask].pinyin,
-                                modifier = Modifier.padding(16.dp,4.dp),
-                                style = MaterialTheme.typography.titleMedium)
-                        }
-                    }
-
-
-                }
-                AnimatedVisibility(isAnswerVisible) {
+                    LinearProgressIndicator(
+                        progress = { animatedProgress },
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .width(250.dp)
+                            .height(15.dp),
+                        color = ProgressIndicatorDefaults.linearColor,
+                        trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                        strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                        gapSize = (-15).dp,
+                        drawStopIndicator = {}
+                    )
                     Card(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        border = BorderStroke(1.dp,Color.Green),
+                        border = BorderStroke(1.dp, Color.Black),
 
 
                         ) {
-                        Text(text = exerciseCharacters[currentTask].translations[0],
-                            modifier = Modifier.padding(16.dp),
-                            style = MaterialTheme.typography.titleLarge)
+                        Column(
+                            modifier = Modifier,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = text,
+                                modifier = Modifier
+                                    .padding(16.dp, 4.dp)
+                                    .animateContentSize()
+                                    .clickable(
+                                        indication = null,
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        onClick = {
+                                            if (!checked) {
+                                                text = if (textPinYin) {
+                                                    exerciseCharacters[currentTask].hanzi
+                                                } else {
+                                                    "${exerciseCharacters[currentTask].hanzi}\n${exerciseCharacters[currentTask].pinyin}"
+                                                }
+                                                textPinYin = !textPinYin
+                                            }
+                                        }),
+                                style = (MaterialTheme.typography.headlineSmall),
+                                textAlign = TextAlign.Center
+                            )
+
+                            if (checked) {
+                                Text(
+                                    text = exerciseCharacters[currentTask].pinyin,
+                                    modifier = Modifier.padding(16.dp, 4.dp),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
+                        }
+
+
+                    }
+                    AnimatedVisibility(isAnswerVisible) {
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                            border = BorderStroke(1.dp, Color.Green),
+
+
+                            ) {
+                            Text(
+                                text = exerciseCharacters[currentTask].translations[0],
+                                modifier = Modifier.padding(16.dp),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+
+                        }
+
+                    }
+                    val currentCorrect = exerciseCharacters[currentTask]
+                    val wrongAnswers = remember(currentTask) {
+                        charactersList.filter { it.id != currentCorrect.id }.shuffled()
+                            .take(answersAmount - 1)
+
+                    }
+                    val allAnswers = remember(currentTask) {
+                        (wrongAnswers + currentCorrect).shuffled()
+                    }
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(allAnswers) { answer ->
+                            AnswerCard(
+                                answer.translations.take(3).joinToString(", \n"),
+                                !isProcessing,
+                                { correct ->
+                                    isProcessing = true
+                                    if (!correct) {
+                                        isAnswerVisible = true
+                                    }
+                                    if (progressCurrentTask < exerciseCharacters.size) {
+                                        progressCurrentTask++
+
+                                    }
+
+                                    scope.launch {
+                                        if (correct) {
+                                            delay(1000)
+                                        } else {
+                                            delay(1500)
+                                            isAnswerVisible = false
+                                        }
+                                        delay(500)
+                                        if (answer.id == currentCorrect.id) {
+                                            points++
+                                        }
+                                        if (currentTask < exerciseCharacters.size - 1) {
+                                            currentTask++
+
+
+                                        } else {
+                                            gameViewModel.addPoints(
+                                                "hanZiMeaningScore",
+                                                points,
+                                                amount
+                                            )
+                                            slideIn = true
+                                        }
+                                        isProcessing = false
+                                    }
+
+
+                                },
+                                correct = answer.id == currentCorrect.id
+                            )
+
+                        }
 
                     }
 
                 }
-                val currentCorrect = exerciseCharacters[currentTask]
-                val wrongAnswers = remember(currentTask){
-                    charactersList.filter { it.id != currentCorrect.id }.shuffled().take(answersAmount - 1)
-
-                }
-                val allAnswers = remember(currentTask){
-                    (wrongAnswers + currentCorrect).shuffled()
-                }
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(allAnswers){  answer ->
-                        AnswerCard(
-                            answer.translations.take(3).joinToString(", \n"),
-                            !isProcessing,
-                            {correct ->
-                                isProcessing = true
-                                if(!correct){
-                                    isAnswerVisible = true
-                                }
-                                if(progressCurrentTask < exerciseCharacters.size){
-                                    progressCurrentTask++
-
-                                }
-
-                                scope.launch {
-                                    if(correct){
-                                        delay(1000)
-                                    }else{
-                                        delay(1500)
-                                        isAnswerVisible = false
-                                    }
-                                    delay(500)
-                                    if(answer.id == currentCorrect.id){
-                                        points++
-                                    }
-                                    if(currentTask < exerciseCharacters.size - 1){
-                                        currentTask++
-
-
-                                    } else {
-                                        exerciseCharacters = emptyList()
-                                        charactersList = emptyList()
-                                        gameViewModel.addPoints("hanZiMeaningScore",points,amount)
-                                        back()
-                                    }
-                                    isProcessing = false
-                                }
-
-
-
-                            },
-                            correct = answer.id == currentCorrect.id
-                        )
-
-                    }
-
-                }
-
             }
         }
     }
-
+}
 }
 
 @Composable
@@ -308,6 +355,7 @@ fun AnswerCard(
         ),
         border = BorderStroke(1.dp, borderColor),
         modifier = Modifier
+            .padding(top=8.dp)
             .clickable(enabled = isEnabled && !clicked) {
                 clicked = true
                 scope.launch{

@@ -201,8 +201,8 @@ fun ExercicesScreen(
                     difficulty,
                     true,
                     "sentencesScore",
-                    false,
-                    ""
+                    true,
+                    "pinyin?"
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))

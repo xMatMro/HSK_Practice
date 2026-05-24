@@ -33,7 +33,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -116,90 +122,121 @@ fun TestDrawingScreen(
         currentIndex = 0
     }
     Surface(color = MaterialTheme.colorScheme.background){
-        if(characterList.isEmpty()){
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-        else{
-            Column(
+        Box(modifier = Modifier.fillMaxSize()) {
+            val backgroundGradientColor = MaterialTheme.colorScheme.primaryContainer
+            val colorStops = arrayOf(
+                0.0f to Color.Transparent,
+                0.2f to backgroundGradientColor.copy(alpha = 0.4f),
+                0.5f to backgroundGradientColor.copy(alpha = 0.9f),
+                0.8f to backgroundGradientColor.copy(alpha = 0.4f),
+                1f to Color.Transparent
+            )
+            Box(
                 modifier = Modifier
-                    .statusBarsPadding()
                     .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                LinearProgressIndicator(
-                    progress = { animatedProgress },
+                    .blur(60.dp)
+                    .drawBehind{
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colorStops = colorStops,
+                                startY = 0f,
+                                endY = size.height,
+
+                                ),
+                            topLeft = Offset(size.width / 2 - size.width / 4, 0f),
+                            size = Size(size.width / 2, size.height)
+                        )
+                    }
+            )
+            if (characterList.isEmpty()) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                Column(
                     modifier = Modifier
-                        .padding(top = 16.dp)
-                        .width(250.dp)
-                        .height(15.dp),
-                    color = ProgressIndicatorDefaults.linearColor,
-                    trackColor = ProgressIndicatorDefaults.linearTrackColor,
-                    strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
-                    gapSize = (-15).dp,
-                    drawStopIndicator = {}
-                )
+                        .statusBarsPadding()
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LinearProgressIndicator(
+                        progress = { animatedProgress },
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .width(250.dp)
+                            .height(15.dp),
+                        color = ProgressIndicatorDefaults.linearColor,
+                        trackColor = ProgressIndicatorDefaults.linearTrackColor,
+                        strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                        gapSize = (-15).dp,
+                        drawStopIndicator = {}
+                    )
 
-                Text(
-                    text = if (currentTask < characterList.size) characterList[currentTask].pinyin else "",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
+                    Text(
+                        text = if (currentTask < characterList.size) characterList[currentTask].pinyin else "",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(16.dp)
+                    )
 
-                Text(
-                    text = if(currentTask<characterList.size) "Znak ${currentIndex + 1}/${characterList[currentTask].hanzi.length}" else "Znak 0/0",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom=16.dp)
-                )
+                    Text(
+                        text = if (currentTask < characterList.size) "Znak ${currentIndex + 1}/${characterList[currentTask].hanzi.length}" else "Znak 0/0",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
 
-                AndroidView(
-                    modifier = Modifier
-                        .width(250.dp)
-                        .height(250.dp)
-                        .clip(RoundedCornerShape(17.dp)),
-                    factory = { factoryContext ->
-                        WebView(factoryContext).apply {
-                            settings.javaScriptEnabled = true
-                            settings.domStorageEnabled = true
-                            settings.allowFileAccess = true
-                            settings.allowContentAccess = true
+                    AndroidView(
+                        modifier = Modifier
+                            .width(250.dp)
+                            .height(250.dp)
+                            .clip(RoundedCornerShape(17.dp)),
+                        factory = { factoryContext ->
+                            WebView(factoryContext).apply {
+                                settings.javaScriptEnabled = true
+                                settings.domStorageEnabled = true
+                                settings.allowFileAccess = true
+                                settings.allowContentAccess = true
 
-                            settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                                settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
-                            addJavascriptInterface(WebAppInterface(
-                                onTaskCompleteCallback = {
-                                    increment()
-                                },
-                                onFinish = {
-                                    scope.launch {
-                                        delay(500)
-                                        back()
+                                addJavascriptInterface(
+                                    WebAppInterface(
+                                        onTaskCompleteCallback = {
+                                            increment()
+                                        },
+                                        onFinish = {
+                                            scope.launch {
+                                                delay(500)
+                                                back()
+                                            }
+
+                                        },
+                                        onIndexChangeCallback = {
+
+                                            currentIndex++
+                                        },
+                                        context = context
+                                    ), "Android"
+                                )
+                                WebView.setWebContentsDebuggingEnabled(true)
+                                webChromeClient = WebChromeClient()
+                                webViewClient = object : WebViewClient() {
+                                    override fun onPageFinished(view: WebView?, url: String?) {
+                                        val jsArray = characterList.map { it.hanzi }
+                                            .joinToString("','", prefix = "['", postfix = "']")
+                                        view?.evaluateJavascript(
+                                            "begin(${jsArray},${difficulty})",
+                                            null
+                                        )
                                     }
-
-                                },
-                                onIndexChangeCallback = {
-
-                                    currentIndex++
-                                },
-                                context = context
-                            ),"Android")
-                            WebView.setWebContentsDebuggingEnabled(true)
-                            webChromeClient = WebChromeClient()
-                            webViewClient = object : WebViewClient() {
-                                override fun onPageFinished(view: WebView?, url: String?) {
-                                    val jsArray = characterList.map {it.hanzi}.joinToString ("','", prefix = "['",postfix = "']")
-                                    view?.evaluateJavascript("begin(${jsArray},${difficulty})", null)
                                 }
+                                loadUrl("file:///android_asset/index.html")
                             }
-                            loadUrl("file:///android_asset/index.html")
-                        }
-                    })
+                        })
+                }
             }
         }
-
     }
 
 }
