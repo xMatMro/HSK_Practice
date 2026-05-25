@@ -68,7 +68,8 @@ fun ExercicesCard(
     viewModel: Boolean,
     viewModelName: String,
     help: Boolean,
-    helpText: String
+    helpText: String,
+    amountInputEnabled: Boolean
 ){
 
     val cornerRadius by animateDpAsState(
@@ -120,7 +121,7 @@ fun ExercicesCard(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Średni wynik:",
+                            text = "Average score:",
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
@@ -132,20 +133,24 @@ fun ExercicesCard(
                     HorizontalDivider(thickness = 2.dp)
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
-                    value = amountInput,
-                    onValueChange = { input ->
-                        if (input.all { it.isDigit() }) {
-                            onAmountChange(input)
-                        }
-                    },
-                    label = { Text("Ilość zadań") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true,
-                    shape = RoundedCornerShape(50.dp)
-                )
+
+                if(amountInputEnabled){
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = amountInput,
+                        onValueChange = { input ->
+                            if (input.all { it.isDigit() }) {
+                                onAmountChange(input)
+                            }
+                        },
+                        label = { Text("Tasks amount") },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true,
+                        shape = RoundedCornerShape(50.dp)
+                    )
+                }
+
                 if (help){
                     Column(
                         modifier = Modifier
@@ -154,7 +159,7 @@ fun ExercicesCard(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ){
                         Text(
-                            text="Czy chcesz ${helpText}?"
+                            text="Do you want ${helpText}?"
                         )
                         Switch(
                             checked = checked,
@@ -205,7 +210,7 @@ fun ExercicesCard(
                         .padding( if (help) 0.dp else 16.dp),
                     shape = RoundedCornerShape(50.dp)
                 ) {
-                    Text("Lecimy!", fontSize = 18.sp, modifier = Modifier.padding(4.dp))
+                    Text("Let's go!", fontSize = 18.sp, modifier = Modifier.padding(4.dp))
                 }
             }
         }

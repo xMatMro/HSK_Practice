@@ -128,7 +128,7 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    "Witaj w HSK Practice!",
+                    "Welcome to HSK Practice!",
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = Bold
@@ -143,7 +143,7 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        "Wybierz poziom HSK",
+                        "Choose HSK level:",
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier,
                         textAlign = TextAlign.Start,

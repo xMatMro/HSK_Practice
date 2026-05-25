@@ -19,6 +19,7 @@ import com.xmatmro.hskpractice.Screens.HanZiMeaningScreen
 import com.xmatmro.hskpractice.Screens.HanZiPinYinScreen
 import com.xmatmro.hskpractice.Screens.HomeScreen
 import com.xmatmro.hskpractice.Screens.SentencesScreen
+import com.xmatmro.hskpractice.Screens.StudyScreen
 import com.xmatmro.hskpractice.Screens.TestDrawingScreen
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
@@ -39,6 +40,7 @@ fun NavigationRoot(
                     subclass(Route.HanZiPinYin::class,Route.HanZiPinYin.serializer())
                     subclass(Route.TestDrawing::class,Route.TestDrawing.serializer())
                     subclass(Route.Sentences::class,Route.Sentences.serializer())
+                    subclass(Route.Study::class,Route.Study.serializer())
                 }
 
             }
@@ -98,6 +100,10 @@ fun NavigationRoot(
                             onFourthClick = { level, amount,difficulty,checked ->
                                 backStack.remove(key)
                                 backStack.add(Route.Sentences(level,amount,difficulty,checked))
+                            },
+                            onFifthClick = {level,amount,difficulty,checked ->
+                                backStack.remove(key)
+                                backStack.add(Route.Study(level))
                             }
                         )
                     }
@@ -139,6 +145,15 @@ fun NavigationRoot(
                             backStack.add(Route.Exercices(key.level))
                         })
 
+                    }
+                }
+
+                is Route.Study -> {
+                    NavEntry(key) {
+                        StudyScreen(level = key.level, back = {
+                            backStack.removeAt(backStack.lastIndex)
+                            backStack.add(Route.Exercices(key.level))
+                        })
                     }
                 }
                 else -> error("Unknown route: $key")

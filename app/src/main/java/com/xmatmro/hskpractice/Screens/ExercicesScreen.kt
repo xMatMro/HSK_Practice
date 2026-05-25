@@ -43,7 +43,8 @@ fun ExercicesScreen(
     onFirstClick: (Int, Int, Int, Boolean) -> Unit,
     onSecondClick: (Int, Int, Int, Boolean) -> Unit,
     onThirdClick: (Int, Int, Int, Boolean) -> Unit,
-    onFourthClick: (Int, Int, Int, Boolean) -> Unit
+    onFourthClick: (Int, Int, Int, Boolean) -> Unit,
+    onFifthClick: (Int, Int, Int, Boolean) -> Unit
 ) {
     val context = LocalContext.current
     var charactersList by remember { mutableStateOf<List<HSKCharactersClass>>(emptyList()) }
@@ -125,7 +126,7 @@ fun ExercicesScreen(
                         .padding(16.dp, 0.dp)
                 ) {
                     Text(
-                        text = "Poziom trudności",
+                        text = "Difficulty",
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f)
@@ -147,75 +148,38 @@ fun ExercicesScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-
-
-
-
                 Text(
-                    text = "Ćwiczenia",
+                    text = "Learning",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f)
                 )
-
                 ExercicesCard(
-                    "Znaczenie znaku",
-                    expanded[0],
+                    title = "Learning characters",
+                    expanded[4],
                     onCardClick,
-                    0,
-                    onFirstClick,
+                    4,
+                    onFifthClick,
                     amountInput,
                     onAmountChange,
                     level,
                     difficulty,
-                    true,
-                    "hanZiMeaningScore",
-                    true,
-                    "pinyin"
+                    false,
+                    "",
+                    false,
+                    helpText = "",
+                    false
                 )
-
-                ExercicesCard(
-                    "Pinyin znaku",
-                    expanded[1],
-                    onCardClick,
-                    1,
-                    onSecondClick,
-                    amountInput,
-                    onAmountChange,
-                    level,
-                    difficulty,
-                    true,
-                    "hanZiPinYinScore",
-                    true,
-                    "tłumaczenie"
-                )
-
-                ExercicesCard(
-                    "Zdania z rozsypanki",
-                    expanded[2],
-                    onCardClick,
-                    2,
-                    onFourthClick,
-                    amountInput,
-                    onAmountChange,
-                    level,
-                    difficulty,
-                    true,
-                    "sentencesScore",
-                    true,
-                    "pinyin?"
-                )
-
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Praktyka",
+                    text = "Practice",
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f)
                 )
 
 
                 ExercicesCard(
-                    title = "Ćwiczenie rysowania",
+                    title = "Practice drawing",
                     expanded[3],
                     onCardClick,
                     3,
@@ -227,8 +191,69 @@ fun ExercicesScreen(
                     false,
                     "testDrawingScore",
                     false,
-                    helpText = ""
+                    helpText = "",
+                    true
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Exercises",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f)
+                )
+
+                ExercicesCard(
+                    "Character meaning",
+                    expanded[0],
+                    onCardClick,
+                    0,
+                    onFirstClick,
+                    amountInput,
+                    onAmountChange,
+                    level,
+                    difficulty,
+                    true,
+                    "hanZiMeaningScore",
+                    true,
+                    "pinyin?",
+                    true
+                )
+
+                ExercicesCard(
+                    "Character pinyin",
+                    expanded[1],
+                    onCardClick,
+                    1,
+                    onSecondClick,
+                    amountInput,
+                    onAmountChange,
+                    level,
+                    difficulty,
+                    true,
+                    "hanZiPinYinScore",
+                    true,
+                    "translation?",
+                    true
+                )
+
+                ExercicesCard(
+                    "Scrambled sentences",
+                    expanded[2],
+                    onCardClick,
+                    2,
+                    onFourthClick,
+                    amountInput,
+                    onAmountChange,
+                    level,
+                    difficulty,
+                    true,
+                    "sentencesScore",
+                    true,
+                    "pinyin?",
+                    true
+                )
+
+
 
 
             }

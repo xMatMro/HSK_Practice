@@ -24,5 +24,7 @@ sealed interface Route: NavKey {
 
     @Serializable
     data class Sentences(val level: Int,val amount: Int,val difficulty: Int,val checked: Boolean) : Route, NavKey
+    @Serializable
+    data class  Study(val level: Int) : Route, NavKey
 }
 

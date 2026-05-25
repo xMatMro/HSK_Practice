@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./hanzi-writer.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            overflow: hidden;
+            background-color: transparent;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #1a1a1a;
+        }
+        #character-target {
+            width: 150px;
+            height: 150px;
+            background-color: #1a1a1a;
+            border-radius: 15px;
+            box-shadow: 0 0px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #animate-btn{
+            margin: 15px 0;
+            padding: 10px 24px;
+            background-color: #b0c6ff;
+            color: #000;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            display: none;
+        }
+    </style>
+    <title>Character Card</title>
+</head>
+<body>
+    <div id="character-target"></div>
+    <button id="animate-btn" onclick="animateCharacter()">Animate</button>
+    <script>
+        let writer;
+        let charsList = []
+        let charIndex = 0;
+        function drawCharacter(char) {
+            if (typeof HanziWriter === 'undefined') {
+                setTimeout(() => drawCharacter(char), 200);
+                return;
+            }
+            if (writer) {
+                try { writer.hideCharacter(); } catch (e) {}
+            }
+            const target = document.getElementById('character-target');
+            target.innerHTML = '';
+            document.getElementById('animate-btn').style.display = 'block';
+            writer = HanziWriter.create('character-target', char, {
+                width: 150,
+                height: 150,
+                showOutline: true,
+                strokeAnimationSpeed: 2,
+                delayBetweenStrokes: 200,
+                padding: 15,
+                strokeColor: '#FFFFFF',
+                outlineColor: '#444444',
+                drawingColor: '#FFFFFF',
+                charDataLoader: function(char) {
+                    return new Promise(function(resolve, reject) {
+                        try {
+                            if (window.Android && window.Android.getAssetData) {
+                                const data = window.Android.getAssetData(char);
+                                if (data) {
+                                    resolve(JSON.parse(data));
+                                } else {
+                                    reject("No data found for: " + char);
+                                }
+                            } else {
+                                fetch('./data/' + char + '.json')
+                                    .then(res => res.json())
+                                    .then(resolve)
+                                    .catch(reject);
+                            }
+                        } catch (e) {
+                            reject(e);
+                        }
+                    });
+                }
+            });
+        }
+        function animateCharacter() {
+            writer.animateCharacter({
+                onComplete: function() {
+                    setTimeout(function(){
+                        next()
+                    }, 1000);
+                }
+            });
+        }
+        function begin(randomTab) {
+            if (charsList.length > 0) return;
+            charsList = randomTab
+            drawCharacter(charsList[charIndex])
+        }
+        function next(){
+            if(charIndex < charsList.length-1){
+                charIndex++
+                drawCharacter(charsList[charIndex])
+                animateCharacter()
+            }
+            else{
+                charIndex = 0
+                drawCharacter(charsList[charIndex])
+            }
+        }
+    </script>
+</body>
+</html>

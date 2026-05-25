@@ -4,6 +4,7 @@ import android.view.Surface
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -71,12 +72,12 @@ fun WinningScreen(
     var isVisible by remember { mutableStateOf(false) }
     val targetScore = if (amount > 0) (points.toFloat() / amount) * 100 else 0f
     val animatedScore by animateFloatAsState(
-        targetValue = if (slideIn) targetScore else 0f,
-        animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing),
+        targetValue = if (isVisible) targetScore else 0f,
+        animationSpec = tween(durationMillis = 1500, easing = LinearEasing),
         label = "scoreAnimation"
     )
     LaunchedEffect(Unit) {
-        delay(500)
+        delay(250)
         isVisible = true
     }
     Surface(color = MaterialTheme.colorScheme.background){
@@ -112,7 +113,7 @@ fun WinningScreen(
                     .statusBarsPadding()
                     .padding(vertical = 80.dp, horizontal = 16.dp)
                     .background(
-                        color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+                        color = MaterialTheme.colorScheme.background.copy(alpha = 0.2f),
                     )
                     .clip(RoundedCornerShape(20.dp))
                     .border(2.dp, MaterialTheme.colorScheme.primary.copy(alpha=0.75f), RoundedCornerShape(20.dp))
@@ -152,8 +153,8 @@ fun WinningScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
+                                modifier = Modifier.size(200.dp).animateContentSize(),
                                 progress = { animatedScore / 100 },
-                                modifier = Modifier.size(200.dp),
                                 color = MaterialTheme.colorScheme.primary,
                                 strokeWidth = 16.dp,
                                 trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
@@ -201,7 +202,8 @@ fun WinningScreen(
                             Icon(
                                 imageVector = Icons.Default.Home,
                                 contentDescription = "Back",
-                                tint = MaterialTheme.colorScheme.onPrimary
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     }
