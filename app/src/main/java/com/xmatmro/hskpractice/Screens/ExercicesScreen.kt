@@ -215,7 +215,7 @@ fun ExercicesScreen(
                     true,
                     "hanZiMeaningScore",
                     true,
-                    "pinyin?",
+                    "pinyin",
                     true
                 )
 
@@ -232,7 +232,7 @@ fun ExercicesScreen(
                     true,
                     "hanZiPinYinScore",
                     true,
-                    "translation?",
+                    "translation",
                     true
                 )
 
@@ -249,7 +249,7 @@ fun ExercicesScreen(
                     true,
                     "sentencesScore",
                     true,
-                    "pinyin?",
+                    "pinyin",
                     true
                 )
 

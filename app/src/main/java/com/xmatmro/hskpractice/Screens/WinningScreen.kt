@@ -196,13 +196,13 @@ fun WinningScreen(
                                 back() },
                             shape = RoundedCornerShape(20.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
+                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
                                 ),
                             ){
                             Icon(
                                 imageVector = Icons.Default.Home,
                                 contentDescription = "Back",
-                                tint = MaterialTheme.colorScheme.onPrimary,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(24.dp)
                             )
                         }

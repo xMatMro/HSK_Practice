@@ -281,7 +281,7 @@ fun StudyScreen(
                         tts
                     )
                 }
-                Spacer(modifier = Modifier.height(72.dp))
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
