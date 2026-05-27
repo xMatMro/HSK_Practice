@@ -222,7 +222,7 @@ fun StudyScreen(
                         shape = RoundedCornerShape(50.dp)
                     ) {
                         Text(
-                            text="Jeszcze tu nic nie ma :)",
+                            text="There is nothing here yet :)",
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(16.dp)
                         )

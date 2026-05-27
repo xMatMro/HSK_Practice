@@ -69,7 +69,8 @@ fun ExercicesCard(
     viewModelName: String,
     help: Boolean,
     helpText: String,
-    amountInputEnabled: Boolean
+    amountInputEnabled: Boolean,
+    desc: String
 ){
 
     val cornerRadius by animateDpAsState(
@@ -106,11 +107,20 @@ fun ExercicesCard(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+
             )
 
             if (expanded) {
                 Spacer(modifier = Modifier.height(16.dp))
+
+                HorizontalDivider(thickness = 2.dp)
+                Text(
+                    text=desc,
+                    style = MaterialTheme.typography.titleSmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
 
                 HorizontalDivider(thickness = 2.dp)
                 if(viewModel){

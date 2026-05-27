@@ -167,7 +167,8 @@ fun ExercicesScreen(
                     "",
                     false,
                     helpText = "",
-                    false
+                    false,
+                    "Learn all the characters from chosen HSK level, use text to speech to learn pronunciation and see how to write them!"
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -192,7 +193,8 @@ fun ExercicesScreen(
                     "testDrawingScore",
                     false,
                     helpText = "",
-                    true
+                    true,
+                    "Use the interactive canvas to trace and memorize the correct stroke order for HSK characters. Perfect for developing \"muscle memory\" for writing.\nDifficulty level 3 will take away the outline, use it to write characters blindly"
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -216,7 +218,8 @@ fun ExercicesScreen(
                     "hanZiMeaningScore",
                     true,
                     "pinyin",
-                    true
+                    true,
+                    " Challenge your recognition skills. Choose the correct translation for the displayed HSK character to build a strong vocabulary foundation.\nDifficulty changes how many confusing answers appear"
                 )
 
                 ExercicesCard(
@@ -233,7 +236,8 @@ fun ExercicesScreen(
                     "hanZiPinYinScore",
                     true,
                     "translation",
-                    true
+                    true,
+                    " Challenge your recognition skills. Choose the correct pinyin for the displayed HSK character to build a strong vocabulary foundation.\nDifficulty changes how many confusing answers appear"
                 )
 
                 ExercicesCard(
@@ -250,7 +254,8 @@ fun ExercicesScreen(
                     "sentencesScore",
                     true,
                     "pinyin",
-                    true
+                    true,
+                    "Construct grammatically correct HSK sentences by reordering shuffled character blocks. The ultimate test of your understanding of Chinese syntax.\nDifficulty level changes amount of blocks that can genarate"
                 )
 
 

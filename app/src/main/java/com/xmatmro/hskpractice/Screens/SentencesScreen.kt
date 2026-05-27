@@ -304,7 +304,7 @@ fun SentencesScreen(
                                         order = emptyList()
                                         delay(1000)
                                     }else{
-                                        delay(1500)
+                                        delay(2500)
                                         isAnswerVisible = false
                                     }
                                     delay(500)
@@ -322,7 +322,7 @@ fun SentencesScreen(
                             }
                         ){
                             Text(
-                                text = "Zatwierdź",
+                                text = "Submit",
                                 fontSize = 18.sp,
                                 modifier = Modifier.padding(4.dp),
                                 textAlign = TextAlign.Center
