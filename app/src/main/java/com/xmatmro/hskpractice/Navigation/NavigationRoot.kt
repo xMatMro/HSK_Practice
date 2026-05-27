@@ -104,7 +104,7 @@ fun NavigationRoot(
                             onFifthClick = {level,amount,difficulty,checked ->
                                 backStack.remove(key)
                                 backStack.add(Route.Study(level))
-                            }
+                            },
                         )
                     }
                 }

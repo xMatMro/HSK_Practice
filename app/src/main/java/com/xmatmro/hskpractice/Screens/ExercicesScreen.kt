@@ -44,7 +44,7 @@ fun ExercicesScreen(
     onSecondClick: (Int, Int, Int, Boolean) -> Unit,
     onThirdClick: (Int, Int, Int, Boolean) -> Unit,
     onFourthClick: (Int, Int, Int, Boolean) -> Unit,
-    onFifthClick: (Int, Int, Int, Boolean) -> Unit
+    onFifthClick: (Int, Int, Int, Boolean) -> Unit,
 ) {
     val context = LocalContext.current
     var charactersList by remember { mutableStateOf<List<HSKCharactersClass>>(emptyList()) }

@@ -2,7 +2,7 @@
 
 A comprehensive Android application for practicing and mastering Chinese Hanzi (HSK 1-6). This app provides a modern, interactive way to learn vocabulary, pinyin, meanings, and character writing.
 
-## ✨ Features
+##Features
 
 - **HSK 1-6 Coverage**: Complete word lists for all HSK levels.
 - **Interactive Learning**: Study mode with flashcards and detailed character information.
@@ -11,10 +11,10 @@ A comprehensive Android application for practicing and mastering Chinese Hanzi (
     - **Pinyin Quiz**: Practice character pronunciation.
     - **Sentence Practice**: See how words are used in context.
     - **Writing Practice**: Interactive Hanzi drawing exercises using `HanziWriter`.
-- **Text-to-Speech (TTS)**: Listen to character pronunciations and sentences.
+- **Text-to-Speech (TTS)**: Listen to character pronunciations.
 - **Modern UI**: Built with Jetpack Compose and Material 3 for a sleek, responsive experience.
 
-## 🛠 Technologies Used
+## Technologies Used
 
 - **Kotlin**: Primary programming language.
 - **Jetpack Compose**: For the modern, declarative UI.
@@ -24,7 +24,7 @@ A comprehensive Android application for practicing and mastering Chinese Hanzi (
 - **Navigation Compose**: Handles smooth transitions between screens.
 - **Hanzi Writer**: JavaScript library integrated for character stroke animations and writing practice.
 
-## 📂 Project Content
+## Project Content
 
 - `app/src/main/assets/`: Contains HSK word lists (HSK 1-6), sentence data, and character stroke data.
 - `app/src/main/java/`:
@@ -35,7 +35,7 @@ A comprehensive Android application for practicing and mastering Chinese Hanzi (
     - `Navigation/`: App routing and navigation logic.
     - `Utils/`: Utility functions like Text-to-Speech.
 
-## 🚀 How to Build on Your Own Device
+## How to Build on Your Own Device
 
 ### Prerequisites
 
@@ -71,6 +71,7 @@ If you prefer using the terminal:
     - **Windows**: `.\gradlew.bat installDebug`
     - **macOS/Linux**: `./gradlew installDebug`
 
-## 📄 License
+## License
 
-This project includes data from various sources. Please refer to `app/src/main/assets/dataset_license.txt` for details regarding the character and sentence datasets.
+This project includes data from various sources. Please refer to `app/src/main/assets/dataset_license.txt` for details regarding the characters datasets.
+

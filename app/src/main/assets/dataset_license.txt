@@ -21,3 +21,29 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE DATASET OR THE USE OR OTHER DEALINGS IN THE
 DATASET.
+
+HanZi Writer license
+
+1. Hanzi Writer
+Source: https://github.com/chanind/hanzi-writer
+License: MIT License
+
+Copyright (c) 2014 David Chanin
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+2. Hanzi Writer Data & Make Me A Hanzi
+Source: https://github.com/chanind/hanzi-writer-data
+License: Arphic Public License
+
+The Chinese character SVG and stroke order data used by Hanzi Writer is derived from the "Make Me A Hanzi" project, which extracted the data from fonts by Arphic Technology, a Taiwanese font forge that released their work under a permissive license in 1999.
+
+You can redistribute and/or modify this data under the terms of the Arphic Public License as published by Arphic Technology Co., Ltd.
+
+Make Me a Hanzi Copyright 1999 Arphic Technology Co., Ltd., copyright 2016 Shaunak Kishore; licensed under the Arphic Public License.
